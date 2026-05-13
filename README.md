@@ -9,7 +9,7 @@ I am not affiliated with Mojang or Microsoft. The intention of this mod is purel
 ***Absolutely no copyright infringement is intended by the hosting of this mod on GitHub.***
 
 ## About
-Minecraft Alpha 1.1.2_01 has many annoying glitches/bugs that hindered my ability to enjoy playing it. That wasn't going to stop me, though.
+Minecraft Alpha 1.1.2_01 has many glitches/bug that make playing this brutal version much harder, annoyingly so. That wasn't going to stop me, though.
 Other mods released, while incredibly technically impressive and fix the same things that this mod does, add just a little too much for my liking, so I decided to make a pretty minimal mod that only changes the game in a very slight quality of life way without any real additions. 
 
 ## Changes
