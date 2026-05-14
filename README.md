@@ -28,6 +28,12 @@ This project aims to provide a **minimal improvement mod**, focused strictly on 
 
 ## Changelog
 
+### Version 1.2 - Second Release
+
+- Added XYZ Coordinates to F3 Menu. No more NBT Editor needed!
+- Double slabs now drop 2 slabs when broken.
+- Item shadows now properly render while Fancy Graphics are enabled.
+
 ### Version 1.1 - Armor Beautification
 
 - Defense Level now properly displays on the GUI.
