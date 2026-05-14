@@ -1,6 +1,4 @@
-# Alpha-QOL
-
-*Content to be added soon*
+# Slighty-Better-Alpha
 
 A lightweight `.jar` mod for **Minecraft Alpha 1.1.2_01** that makes small, focused quality-of-life improvements while staying as close to vanilla as possible.
 
