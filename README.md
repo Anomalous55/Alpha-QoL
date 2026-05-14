@@ -8,7 +8,7 @@ A lightweight `.jar` mod for **Minecraft Alpha 1.1.2_01** that makes small, focu
 
 This project is not affiliated with Mojang or Microsoft.
 
-It is intended for entertainment and educational purposes only. This repository does not contain, distribute, or intend to distribute any proprietary Minecraft source code.
+It is intended for entertainment and educational purposes only. This repository does not intend to illegally distribute or encourage the illegal distribution of any proprietary Minecraft source code.
 
 If any content is found to violate copyright or distribution policies, it will be removed immediately upon request by an authorized representative.
 
@@ -18,11 +18,11 @@ No copyright infringement is intended.
 
 ## About
 
-Minecraft Alpha 1.1.2_01 contains several bugs and inconsistencies that can make gameplay unnecessarily frustrating.
+Minecraft Alpha 1.1.2_01 is an incomplete version that has a far more brutal gameplay loop than the modern releases. The limitations and constraints on content make this an interesting and nostalgic version to play, but some bugs, glitches, and inconsistencies make this version downright unfair at some points. 
 
 While there are existing mods that address these issues, many introduce additional mechanics or major gameplay changes that go beyond the scope of a minimal fix.
 
-This project aims to provide a **minimal improvement mod**, focused strictly on small quality-of-life fixes without adding any new features or compromising the vanilla experience.
+This project aims to provide **minimal improvement**, focused strictly on small quality-of-life fixes without adding any new features, implementing any of the various unused assets, or compromising the vanilla experience.
 
 ---
 
