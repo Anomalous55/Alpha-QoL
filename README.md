@@ -1,4 +1,4 @@
-# Slighty-Better-Alpha
+# Alpha-QoL
 
 A lightweight `.jar` mod for **Minecraft Alpha 1.1.2_01** that makes small, focused quality-of-life improvements while staying as close to vanilla as possible.
 
@@ -28,6 +28,10 @@ This project aims to provide a **minimal improvement mod**, focused strictly on 
 
 ## Changelog
 
+### Version 1.1 - Armor Beautification
+
+- Defense Level now properly displays on the GUI.
+
 ### Version 1.0 — Initial Release
 
 - Armor defensive values are no longer tied to durability.
@@ -36,7 +40,7 @@ This project aims to provide a **minimal improvement mod**, focused strictly on 
 - Porkchops and Cooked Porkchops now stack up to 8.
 - Falling Snow in Winter Mode worlds now have a less obtrusive texture.  
 - New Splashes! 
-- Removed Herobrine
+- Removed Herobrine...
 
 ---
 
