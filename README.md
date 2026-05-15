@@ -28,6 +28,19 @@ This project aims to provide **minimal improvement**, focused strictly on small 
 
 ## Changelog
 
+### Version 1.3 - Third Release
+
+- You can now swap items of the same kind in the inventory.
+- You can no longer eat food while your health is full.
+- Cacti will no longer destroy dropped Cactus items.
+- Stack sizes of Wooden Doors, Iron Doors, and Signs have been increased to 16.
+- The default Inventory key is now 'E'.
+- Saddled Pigs will now drop their saddle when killed.
+- Fixed a bug where pressing a movement key and the Inventory key at the same time would cause you to move until the 'ESC' key is pressed.
+- Fixed a bug where liquids would be placed when interacting with a block.
+- Fixed a bug where instantly breakable blocks would be broken open returning to game from pause menu.
+- Removed the 'Limit FPS' option as it doesn't really do anything useful.
+
 ### Version 1.2 - Second Release
 
 - Added XYZ Coordinates to F3 Menu. No more NBT Editor needed!
