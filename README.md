@@ -22,49 +22,38 @@ Minecraft Alpha 1.1.2_01 is an incomplete version that has a far more brutal gam
 
 While there are existing mods that address these issues, many introduce additional mechanics or major gameplay changes that go beyond the scope of a minimal fix.
 
-This project aims to provide **minimal improvement**, focused strictly on small quality-of-life fixes without adding any new features, implementing any of the various unused assets, or compromising the vanilla experience.
+This project aims to provide **minimal improvement**, focused strictly on small quality-of-life fixes without adding any new features, implementing any of the various unused assets, or compromising the brutal vanilla experience, leaving room for player ingenuity to overcome the difficulty.
 
 ---
 
-## Changelog
+## Change List (as of the most recent version)
 
-### Version 1.3 - Third Release
-
+- Added XYZ Coordinates to F3 Menu. No more NBT Editor needed!
+- Armor defense values are no longer tied to durability.
+- Defense Level now properly displays on the GUI.
 - You can now swap items of the same kind in the inventory.
 - You can no longer eat food while your health is full.
 - Cacti will no longer destroy dropped Cactus items.
+- Doubled the durability of all tools and armor.
 - Stack sizes of Wooden Doors, Iron Doors, and Signs have been increased to 16.
 - The default Inventory key is now 'E'.
+- Pickaxes and axes now correctly break their intended blocks.
+- Double slabs now drop 2 slabs when broken.
 - Saddled Pigs will now drop their saddle when killed.
+- Porkchops and Cooked Porkchops now stack up to 8.
+- Falling Snow in Winter Mode worlds now has a less obtrusive texture.  
 - Fixed a bug where pressing a movement key and the Inventory key at the same time would cause you to move until the 'ESC' key is pressed.
 - Fixed a bug where liquids would be placed when interacting with a block.
 - Fixed a bug where instantly breakable blocks would be broken open returning to game from pause menu.
+- Fixed a bug where multiple item shadows would render while Fancy Graphics are enabled.
+- New Splashes!
 - Removed the 'Limit FPS' option as it doesn't really do anything useful.
-
-### Version 1.2 - Second Release
-
-- Added XYZ Coordinates to F3 Menu. No more NBT Editor needed!
-- Double slabs now drop 2 slabs when broken.
-- Item shadows now properly render while Fancy Graphics are enabled.
-
-### Version 1.1 - Armor Beautification
-
-- Defense Level now properly displays on the GUI.
-
-### Version 1.0 — Initial Release
-
-- Armor defensive values are no longer tied to durability.
-- Doubled durability for all tools.
-- Pickaxes and axes now correctly break their intended blocks.
-- Porkchops and Cooked Porkchops now stack up to 8.
-- Falling Snow in Winter Mode worlds now have a less obtrusive texture.  
-- New Splashes! 
-- Removed Herobrine...
-
+- Removed Herobrine
+  
 ---
 
 ## Installation
 
-Open your `version.jar` file using an archive editor, then add the mod files into it, overwriting existing files when prompted.
+Open your `version.jar` file using an archive editor, Delete `META-INF` then add the mod files into it, overwriting existing files when prompted.
 
 Launch the game and enjoy.
