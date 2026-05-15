@@ -36,11 +36,11 @@ This project aims to provide **minimal improvement**, focused strictly on small 
 - Cacti will no longer destroy dropped Cactus items.
 - Doubled the durability of all tools and armor.
 - Stack sizes of Wooden Doors, Iron Doors, and Signs have been increased to 16.
+- Stack sizes of Porkchops and Cooked Porkchops have been increased to 8.
 - The default Inventory key is now 'E'.
 - Pickaxes and axes now correctly break their intended blocks.
 - Double slabs now drop 2 slabs when broken.
 - Saddled Pigs will now drop their saddle when killed.
-- Porkchops and Cooked Porkchops now stack up to 8.
 - Falling Snow in Winter Mode worlds now has a less obtrusive texture.  
 - Fixed a bug where pressing a movement key and the Inventory key at the same time would cause you to move until the 'ESC' key is pressed.
 - Fixed a bug where liquids would be placed when interacting with a block.
