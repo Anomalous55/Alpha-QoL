@@ -29,7 +29,8 @@ This project aims to provide **minimal improvement**, focused strictly on small 
 ## Change List (as of the most recent version)
 
 - Added XYZ Coordinates to F3 Menu.
-- Added World Seed to F3 Menu
+- Added World Seed to F3 Menu.
+- Added Day Counter to F3 Menu.
 - Added a secret method you may be familiar with to prevent farmland from being trampled.
 - Armor defense values are no longer tied to durability.
 - Defense Level now properly displays on the GUI.
@@ -38,17 +39,19 @@ This project aims to provide **minimal improvement**, focused strictly on small 
 - Cacti will no longer destroy dropped Cactus items.
 - Doubled the durability of all tools and armor.
 - Stack sizes of Wooden Doors, Iron Doors, and Signs have been increased to 16.
-- Stack sizes of Porkchops and Cooked Porkchops have been increased to 8.
 - The default Inventory key is now 'E'.
 - Pickaxes, axes, and spades now correctly break their intended blocks.
 - Double slabs now drop 2 slabs when broken.
 - Stairs will now drop the stair block when broken.
+- Bookshelves drop themselves when broken.
 - Saddled Pigs will now drop their saddle when killed.
+- Pressure Plates properly drop themselves when broken.
 - Falling Snow in Winter Mode worlds now has a less obtrusive texture.  
 - Fixed a bug where pressing a movement key and the Inventory key at the same time would cause you to move until the 'ESC' key is pressed.
 - Fixed a bug where liquids would be placed when interacting with a block.
 - Fixed a bug where instantly breakable blocks would be broken open returning to game from pause menu.
 - Fixed a bug where multiple item shadows would render while Fancy Graphics are enabled.
+- Fixed a bug where your footsteps all play at once after sneaking.
 - Fixed the orientation of stairs, furnaces, chests, and double chests.
 - Fixed the hitbox of stairs.
 - Removed the 'Limit FPS' option as it doesn't really do anything useful.
