@@ -60,6 +60,8 @@ This project aims to provide **minimal improvement**, focused strictly on small 
 
 ## Installation
 
+Download the latest release [here](https://github.com/Anomalous55/Alpha-QoL/releases).
+
 Open your `version.jar` file using an archive editor, Delete `META-INF` then add the mod files into it, overwriting existing files when prompted.
 
 Launch the game and enjoy.
