@@ -1,0 +1,1138 @@
+--- net/minecraft/src/ItemBlock.java
++++ net/minecraft/src/ItemBlock.java
+@@ -43,14 +43,15 @@
+ 		} else {
+ 			if(var3.canBlockBePlacedAt(this.blockID, var4, var5, var6, false)) {
+ 				Block var8 = Block.blocksList[this.blockID];
++				BlockPlacementHelper.placingPlayer = var2; // store player before placement
+ 				if(var3.setBlockWithNotify(var4, var5, var6, this.blockID)) {
+-					Block.blocksList[this.blockID].onBlockPlaced(var3, var4, var5, var6, var7);
++					var8.onBlockPlaced(var3, var4, var5, var6, var7);
+ 					var3.playSoundEffect((double)((float)var4 + 0.5F), (double)((float)var5 + 0.5F), (double)((float)var6 + 0.5F), var8.stepSound.getStepSound(), (var8.stepSound.getVolume() + 1.0F) / 2.0F, var8.stepSound.getPitch() * 0.8F);
+ 					--var1.stackSize;
+ 				}
++				BlockPlacementHelper.placingPlayer = null; // clear after placement
+ 			}
+-
+-			return true;
+ 		}
++		return true;
+ 	}
+ }
+--- net/minecraft/src/GuiIngameMenu.java
++++ net/minecraft/src/GuiIngameMenu.java
+@@ -32,7 +32,6 @@
+ 
+ 		if(var1.id == 4) {
+ 			this.mc.displayGuiScreen((GuiScreen)null);
+-			this.mc.setIngameFocus();
+ 		}
+ 
+ 	}
+--- net/minecraft/src/ItemSpade.java
++++ net/minecraft/src/ItemSpade.java
+@@ -1,7 +1,7 @@
+ package net.minecraft.src;
+ 
+ public class ItemSpade extends ItemTool {
+-	private static Block[] blocksEffectiveAgainst = new Block[]{Block.grass, Block.dirt, Block.sand, Block.gravel, Block.snow, Block.blockSnow, Block.blockClay};
++	private static Block[] blocksEffectiveAgainst = new Block[]{Block.grass, Block.dirt, Block.sand, Block.gravel, Block.snow, Block.blockSnow, Block.blockClay, Block.tilledField};
+ 
+ 	public ItemSpade(int var1, int var2) {
+ 		super(var1, 1, var2, blocksEffectiveAgainst);
+--- net/minecraft/src/ItemFood.java
++++ net/minecraft/src/ItemFood.java
+@@ -10,6 +10,9 @@
+ 	}
+ 
+ 	public ItemStack onItemRightClick(ItemStack var1, World var2, EntityPlayer var3) {
++		if(var3.health >= 20) {
++			return var1;
++		}
+ 		--var1.stackSize;
+ 		var3.heal(this.healAmount);
+ 		return var1;
+--- net/minecraft/src/EntityPig.java
++++ net/minecraft/src/EntityPig.java
+@@ -20,6 +20,13 @@
+ 		this.saddled = var1.getBoolean("Saddle");
+ 	}
+ 
++	public void onDeath(Entity var1) {
++		super.onDeath(var1);
++		if(this.saddled) {
++			this.dropItem(Item.saddle.shiftedIndex, 1);
++		}
++	}
++
+ 	protected String getLivingSound() {
+ 		return "mob.pig";
+ 	}
+--- net/minecraft/src/GuiIngame.java
++++ net/minecraft/src/GuiIngame.java
+@@ -59,22 +59,23 @@
+ 		int var14;
+ 		int var15;
+ 		if(this.mc.playerController.shouldDrawHUD()) {
+-			var13 = this.mc.thePlayer.getPlayerArmorValue();
++			var13 = this.mc.thePlayer.inventory.getArmorDisplayValue();
+ 
+ 			int var16;
+ 			for(var14 = 0; var14 < 10; ++var14) {
+ 				var15 = var7 - 32;
+-				if(var13 > 0) {
++				if (var13 > 0) {
++					int armorIcons = (int)Math.ceil(var13 / 2.0D);
+ 					var16 = var6 / 2 + 91 - var14 * 8 - 9;
+-					if(var14 * 2 + 1 < var13) {
++					int armorValueForIcon = var14 * 2;
++					if (armorValueForIcon + 2 <= var13) {
++					// full armor icon
+ 						this.drawTexturedModalRect(var16, var15, 34, 9, 9, 9);
+-					}
+-
+-					if(var14 * 2 + 1 == var13) {
++					} else if (armorValueForIcon + 1 == var13) {
++					// half armor icon
+ 						this.drawTexturedModalRect(var16, var15, 25, 9, 9, 9);
+-					}
+-
+-					if(var14 * 2 + 1 > var13) {
++					} else if (armorValueForIcon < var13) {
++					// empty/partial fallback
+ 						this.drawTexturedModalRect(var16, var15, 16, 9, 9, 9);
+ 					}
+ 				}
+@@ -152,6 +153,16 @@
+ 			this.drawString(var8, var21, var6 - var8.getStringWidth(var21) - 2, 2, 14737632);
+ 			var21 = "Allocated memory: " + var27 * 100L / var22 + "% (" + var27 / 1024L / 1024L + "MB)";
+ 			this.drawString(var8, var21, var6 - var8.getStringWidth(var21) - 2, 12, 14737632);
++			EntityPlayer p = this.mc.thePlayer;
++
++			String coords = "XYZ: " +
++			(int)p.posX + " / " +
++			(int)p.posY + " / " +
++			(int)p.posZ;
++
++			var8.drawStringWithShadow("Day: " + ((this.mc.theWorld.worldTime / 24000) + 1), 2, 42, 16777215);
++			var8.drawStringWithShadow("Seed: " + this.mc.theWorld.randomSeed, 2, 52, 16777215);
++			var8.drawStringWithShadow(coords, 2, 62, 16777215);
+ 		} else {
+ 			var8.drawStringWithShadow("Minecraft Alpha v1.1.2_01", 2, 2, 16777215);
+ 		}
+--- net/minecraft/src/GuiContainer.java
++++ net/minecraft/src/GuiContainer.java
+@@ -94,110 +94,121 @@
+ 	}
+ 
+ 	protected void mouseClicked(int var1, int var2, int var3) {
+-		if(var3 == 0 || var3 == 1) {
+-			Slot var4 = this.getSlotAtPosition(var1, var2);
+-			InventoryPlayer var5 = this.mc.thePlayer.inventory;
+-			int var7;
+-			if(var4 != null) {
+-				ItemStack var6 = var4.getStack();
+-				if(var6 != null || var5.draggedItemStack != null) {
+-					if(var6 != null && var5.draggedItemStack == null) {
+-						var7 = var3 == 0 ? var6.stackSize : (var6.stackSize + 1) / 2;
+-						var5.draggedItemStack = var4.inventory.decrStackSize(var4.slotIndex, var7);
+-						if(var6.stackSize == 0) {
+-							var4.putStack((ItemStack)null);
+-						}
+-
+-						var4.onPickupFromSlot();
+-					} else if(var6 == null && var5.draggedItemStack != null && var4.isItemValid(var5.draggedItemStack)) {
+-						var7 = var3 == 0 ? var5.draggedItemStack.stackSize : 1;
+-						if(var7 > var4.inventory.getInventoryStackLimit()) {
+-							var7 = var4.inventory.getInventoryStackLimit();
+-						}
+-
+-						var4.putStack(var5.draggedItemStack.splitStack(var7));
+-						if(var5.draggedItemStack.stackSize == 0) {
+-							var5.draggedItemStack = null;
+-						}
+-					} else if(var6 != null && var5.draggedItemStack != null) {
+-						if(var4.isItemValid(var5.draggedItemStack)) {
+-							if(var6.itemID != var5.draggedItemStack.itemID) {
+-								if(var5.draggedItemStack.stackSize <= var4.inventory.getInventoryStackLimit()) {
+-									var4.putStack(var5.draggedItemStack);
+-									var5.draggedItemStack = var6;
+-								}
+-							} else if(var6.itemID == var5.draggedItemStack.itemID) {
+-								if(var3 == 0) {
+-									var7 = var5.draggedItemStack.stackSize;
+-									if(var7 > var4.inventory.getInventoryStackLimit() - var6.stackSize) {
+-										var7 = var4.inventory.getInventoryStackLimit() - var6.stackSize;
+-									}
+-
+-									if(var7 > var5.draggedItemStack.getMaxStackSize() - var6.stackSize) {
+-										var7 = var5.draggedItemStack.getMaxStackSize() - var6.stackSize;
+-									}
+-
+-									var5.draggedItemStack.splitStack(var7);
+-									if(var5.draggedItemStack.stackSize == 0) {
+-										var5.draggedItemStack = null;
+-									}
+-
+-									var6.stackSize += var7;
+-								} else if(var3 == 1) {
+-									var7 = 1;
+-									if(var7 > var4.inventory.getInventoryStackLimit() - var6.stackSize) {
+-										var7 = var4.inventory.getInventoryStackLimit() - var6.stackSize;
+-									}
+-
+-									if(var7 > var5.draggedItemStack.getMaxStackSize() - var6.stackSize) {
+-										var7 = var5.draggedItemStack.getMaxStackSize() - var6.stackSize;
+-									}
+-
+-									var5.draggedItemStack.splitStack(var7);
+-									if(var5.draggedItemStack.stackSize == 0) {
+-										var5.draggedItemStack = null;
+-									}
+-
+-									var6.stackSize += var7;
+-								}
+-							}
+-						} else if(var6.itemID == var5.draggedItemStack.itemID && var5.draggedItemStack.getMaxStackSize() > 1) {
+-							var7 = var6.stackSize;
+-							if(var7 > 0 && var7 + var5.draggedItemStack.stackSize <= var5.draggedItemStack.getMaxStackSize()) {
+-								var5.draggedItemStack.stackSize += var7;
+-								var6.splitStack(var7);
+-								if(var6.stackSize == 0) {
+-									var4.putStack((ItemStack)null);
+-								}
+-
+-								var4.onPickupFromSlot();
+-							}
+-						}
+-					}
+-				}
+-
+-				var4.onSlotChanged();
+-			} else if(var5.draggedItemStack != null) {
+-				int var9 = (this.width - this.xSize) / 2;
+-				var7 = (this.height - this.ySize) / 2;
+-				if(var1 < var9 || var2 < var7 || var1 >= var9 + this.xSize || var2 >= var7 + this.xSize) {
+-					EntityPlayerSP var8 = this.mc.thePlayer;
+-					if(var3 == 0) {
+-						var8.dropPlayerItem(var5.draggedItemStack);
+-						var5.draggedItemStack = null;
+-					}
+-
+-					if(var3 == 1) {
+-						var8.dropPlayerItem(var5.draggedItemStack.splitStack(1));
+-						if(var5.draggedItemStack.stackSize == 0) {
+-							var5.draggedItemStack = null;
+-						}
+-					}
+-				}
+-			}
+-		}
+-
+-	}
++	if(var3 == 0 || var3 == 1) {
++		Slot var4 = this.getSlotAtPosition(var1, var2);
++		InventoryPlayer var5 = this.mc.thePlayer.inventory;
++        int var7;
++        if(var4 != null) {
++            ItemStack var6 = var4.getStack();
++            if(var6 != null || var5.draggedItemStack != null) {
++                if(var6 != null && var5.draggedItemStack == null) {
++                    var7 = var3 == 0 ? var6.stackSize : (var6.stackSize + 1) / 2;
++                    var5.draggedItemStack = var4.inventory.decrStackSize(var4.slotIndex, var7);
++                    if(var6.stackSize == 0) {
++                        var4.putStack((ItemStack)null);
++                    }
++
++                    var4.onPickupFromSlot();
++                } else if(var6 == null && var5.draggedItemStack != null && var4.isItemValid(var5.draggedItemStack)) {
++                    var7 = var3 == 0 ? var5.draggedItemStack.stackSize : 1;
++                    if(var7 > var4.inventory.getInventoryStackLimit()) {
++                        var7 = var4.inventory.getInventoryStackLimit();
++                    }
++
++                    var4.putStack(var5.draggedItemStack.splitStack(var7));
++                    if(var5.draggedItemStack.stackSize == 0) {
++                        var5.draggedItemStack = null;
++                    }
++                } else if(var6 != null && var5.draggedItemStack != null) {
++                    if(var4.isItemValid(var5.draggedItemStack)) {
++                        if(var6.itemID != var5.draggedItemStack.itemID) {
++                            if(var5.draggedItemStack.stackSize <= var4.inventory.getInventoryStackLimit()) {
++                                var4.putStack(var5.draggedItemStack);
++                                var5.draggedItemStack = var6;
++                            }
++                        } else if(var6.itemID == var5.draggedItemStack.itemID) {
++                            if(var3 == 0) {
++                                var7 = var5.draggedItemStack.stackSize;
++                                if(var7 > var4.inventory.getInventoryStackLimit() - var6.stackSize) {
++                                    var7 = var4.inventory.getInventoryStackLimit() - var6.stackSize;
++                                }
++
++                                if(var7 > var5.draggedItemStack.getMaxStackSize() - var6.stackSize) {
++                                    var7 = var5.draggedItemStack.getMaxStackSize() - var6.stackSize;
++                                }
++
++                                if(var7 > 0) {
++                                    var5.draggedItemStack.splitStack(var7);
++                                    if(var5.draggedItemStack.stackSize == 0) {
++                                        var5.draggedItemStack = null;
++                                    }
++                                    var6.stackSize += var7;
++                                } else {
++                                    if(var5.draggedItemStack.stackSize <= var4.inventory.getInventoryStackLimit()) {
++                                        var4.putStack(var5.draggedItemStack);
++                                        var5.draggedItemStack = var6;
++                                    }
++                                }
++                            } else if(var3 == 1) {
++                                var7 = 1;
++                                if(var7 > var4.inventory.getInventoryStackLimit() - var6.stackSize) {
++                                    var7 = var4.inventory.getInventoryStackLimit() - var6.stackSize;
++                                }
++
++                                if(var7 > var5.draggedItemStack.getMaxStackSize() - var6.stackSize) {
++                                    var7 = var5.draggedItemStack.getMaxStackSize() - var6.stackSize;
++                                }
++
++                                if(var7 > 0) {
++                                    var5.draggedItemStack.splitStack(var7);
++                                    if(var5.draggedItemStack.stackSize == 0) {
++                                        var5.draggedItemStack = null;
++                                    }
++                                    var6.stackSize += var7;
++                                } else {
++                                    if(var5.draggedItemStack.stackSize <= var4.inventory.getInventoryStackLimit()) {
++                                        var4.putStack(var5.draggedItemStack);
++                                        var5.draggedItemStack = var6;
++                                    }
++                                }
++                            }
++                        }
++                    } else if(var6.itemID == var5.draggedItemStack.itemID && var5.draggedItemStack.getMaxStackSize() > 1) {
++                        var7 = var6.stackSize;
++                        if(var7 > 0 && var7 + var5.draggedItemStack.stackSize <= var5.draggedItemStack.getMaxStackSize()) {
++                            var5.draggedItemStack.stackSize += var7;
++                            var6.splitStack(var7);
++                            if(var6.stackSize == 0) {
++                                var4.putStack((ItemStack)null);
++                            }
++
++                            var4.onPickupFromSlot();
++                        }
++                    }
++                }
++            }
++
++            var4.onSlotChanged();
++        } else if(var5.draggedItemStack != null) {
++            int var9 = (this.width - this.xSize) / 2;
++            var7 = (this.height - this.ySize) / 2;
++            if(var1 < var9 || var2 < var7 || var1 >= var9 + this.xSize || var2 >= var7 + this.xSize) {
++                EntityPlayerSP var8 = this.mc.thePlayer;
++                if(var3 == 0) {
++                    var8.dropPlayerItem(var5.draggedItemStack);
++                    var5.draggedItemStack = null;
++                }
++
++                if(var3 == 1) {
++                    var8.dropPlayerItem(var5.draggedItemStack.splitStack(1));
++                    if(var5.draggedItemStack.stackSize == 0) {
++                        var5.draggedItemStack = null;
++                    }
++                }
++            }
++        }
++    }
++}
+ 
+ 	protected void mouseMovedOrUp(int var1, int var2, int var3) {
+ 		if(var3 == 0) {
+--- net/minecraft/src/BlockChest.java
++++ net/minecraft/src/BlockChest.java
+@@ -23,48 +23,19 @@
+ 			int var10;
+ 			int var11;
+ 			int var12;
+-			byte var13;
+ 			if(var6 != this.blockID && var7 != this.blockID) {
+ 				if(var8 != this.blockID && var9 != this.blockID) {
+-					byte var14 = 3;
+-					if(Block.opaqueCubeLookup[var6] && !Block.opaqueCubeLookup[var7]) {
+-						var14 = 3;
+-					}
+-
+-					if(Block.opaqueCubeLookup[var7] && !Block.opaqueCubeLookup[var6]) {
+-						var14 = 2;
+-					}
+-
+-					if(Block.opaqueCubeLookup[var8] && !Block.opaqueCubeLookup[var9]) {
+-						var14 = 5;
+-					}
+-
+-					if(Block.opaqueCubeLookup[var9] && !Block.opaqueCubeLookup[var8]) {
+-						var14 = 4;
+-					}
+-
++					int var14 = var1.getBlockMetadata(var2, var3, var4);
+ 					return var5 == var14 ? this.blockIndexInTexture + 1 : this.blockIndexInTexture;
+ 				} else if(var5 != 4 && var5 != 5) {
+ 					var10 = 0;
+ 					if(var8 == this.blockID) {
+ 						var10 = -1;
+ 					}
+-
+-					var11 = var1.getBlockId(var8 == this.blockID ? var2 - 1 : var2 + 1, var3, var4 - 1);
+-					var12 = var1.getBlockId(var8 == this.blockID ? var2 - 1 : var2 + 1, var3, var4 + 1);
+ 					if(var5 == 3) {
+ 						var10 = -1 - var10;
+ 					}
+-
+-					var13 = 3;
+-					if((Block.opaqueCubeLookup[var6] || Block.opaqueCubeLookup[var11]) && !Block.opaqueCubeLookup[var7] && !Block.opaqueCubeLookup[var12]) {
+-						var13 = 3;
+-					}
+-
+-					if((Block.opaqueCubeLookup[var7] || Block.opaqueCubeLookup[var12]) && !Block.opaqueCubeLookup[var6] && !Block.opaqueCubeLookup[var11]) {
+-						var13 = 2;
+-					}
+-
++					int var13 = var1.getBlockMetadata(var2, var3, var4);
+ 					return (var5 == var13 ? this.blockIndexInTexture + 16 : this.blockIndexInTexture + 32) + var10;
+ 				} else {
+ 					return this.blockIndexInTexture;
+@@ -74,22 +45,10 @@
+ 				if(var6 == this.blockID) {
+ 					var10 = -1;
+ 				}
+-
+-				var11 = var1.getBlockId(var2 - 1, var3, var6 == this.blockID ? var4 - 1 : var4 + 1);
+-				var12 = var1.getBlockId(var2 + 1, var3, var6 == this.blockID ? var4 - 1 : var4 + 1);
+ 				if(var5 == 4) {
+ 					var10 = -1 - var10;
+ 				}
+-
+-				var13 = 5;
+-				if((Block.opaqueCubeLookup[var8] || Block.opaqueCubeLookup[var11]) && !Block.opaqueCubeLookup[var9] && !Block.opaqueCubeLookup[var12]) {
+-					var13 = 5;
+-				}
+-
+-				if((Block.opaqueCubeLookup[var9] || Block.opaqueCubeLookup[var12]) && !Block.opaqueCubeLookup[var8] && !Block.opaqueCubeLookup[var11]) {
+-					var13 = 4;
+-				}
+-
++				int var13 = var1.getBlockMetadata(var2, var3, var4);
+ 				return (var5 == var13 ? this.blockIndexInTexture + 16 : this.blockIndexInTexture + 32) + var10;
+ 			} else {
+ 				return this.blockIndexInTexture;
+@@ -189,6 +148,34 @@
+ 			return true;
+ 		}
+ 	}
++
++	public void onBlockAdded(World var1, int var2, int var3, int var4) {
++		super.onBlockAdded(var1, var2, var3, var4);
++		if(BlockPlacementHelper.placingPlayer != null) {
++			int var5 = MathHelper.floor_double((double)(BlockPlacementHelper.placingPlayer.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
++			int var6;
++			if(var5 == 0) var6 = 2;
++			else if(var5 == 1) var6 = 5;
++			else if(var5 == 2) var6 = 3;
++			else var6 = 4;
++
++			var1.setBlockMetadataWithNotify(var2, var3, var4, var6);
++
++			if(var1.getBlockId(var2 - 1, var3, var4) == this.blockID) {
++				var1.setBlockMetadataWithNotify(var2 - 1, var3, var4, var6);
++			}
++			if(var1.getBlockId(var2 + 1, var3, var4) == this.blockID) {
++				var1.setBlockMetadataWithNotify(var2 + 1, var3, var4, var6);
++			}
++			if(var1.getBlockId(var2, var3, var4 - 1) == this.blockID) {
++				var1.setBlockMetadataWithNotify(var2, var3, var4 - 1, var6);
++			}
++			if(var1.getBlockId(var2, var3, var4 + 1) == this.blockID) {
++				var1.setBlockMetadataWithNotify(var2, var3, var4 + 1, var6);
++			}
++		}
++	}
++
+ 
+ 	protected TileEntity getBlockEntity() {
+ 		return new TileEntityChest();
+--- net/minecraft/src/BlockStairs.java
++++ net/minecraft/src/BlockStairs.java
+@@ -59,20 +59,6 @@
+ 
+ 	public void onNeighborBlockChange(World var1, int var2, int var3, int var4, int var5) {
+ 		if(!var1.multiplayerWorld) {
+-			if(var1.getBlockMaterial(var2, var3 + 1, var4).isSolid()) {
+-				var1.setBlockWithNotify(var2, var3, var4, this.modelBlock.blockID);
+-			} else {
+-				this.updateState(var1, var2, var3, var4);
+-				this.updateState(var1, var2 + 1, var3 - 1, var4);
+-				this.updateState(var1, var2 - 1, var3 - 1, var4);
+-				this.updateState(var1, var2, var3 - 1, var4 - 1);
+-				this.updateState(var1, var2, var3 - 1, var4 + 1);
+-				this.updateState(var1, var2 + 1, var3 + 1, var4);
+-				this.updateState(var1, var2 - 1, var3 + 1, var4);
+-				this.updateState(var1, var2, var3 + 1, var4 - 1);
+-				this.updateState(var1, var2, var3 + 1, var4 + 1);
+-			}
+-
+ 			this.modelBlock.onNeighborBlockChange(var1, var2, var3, var4, var5);
+ 		}
+ 	}
+@@ -173,7 +159,7 @@
+ 	}
+ 
+ 	public int idDropped(int var1, Random var2) {
+-		return this.modelBlock.idDropped(var1, var2);
++		return this.blockID;
+ 	}
+ 
+ 	public int quantityDropped(Random var1) {
+@@ -197,7 +183,7 @@
+ 	}
+ 
+ 	public AxisAlignedBB getSelectedBoundingBoxFromPool(World var1, int var2, int var3, int var4) {
+-		return this.modelBlock.getSelectedBoundingBoxFromPool(var1, var2, var3, var4);
++		return AxisAlignedBB.getBoundingBoxFromPool((double)var2, (double)var3, (double)var4, (double)(var2 + 1), (double)(var3 + 1), (double)(var4 + 1));
+ 	}
+ 
+ 	public void velocityToAddToEntity(World var1, int var2, int var3, int var4, Entity var5, Vec3D var6) {
+@@ -217,7 +203,15 @@
+ 	}
+ 
+ 	public void onBlockAdded(World var1, int var2, int var3, int var4) {
+-		this.onNeighborBlockChange(var1, var2, var3, var4, 0);
++		if(BlockPlacementHelper.placingPlayer != null) {
++			int var5 = MathHelper.floor_double((double)(BlockPlacementHelper.placingPlayer.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
++			if(var5 == 0) var1.setBlockMetadataWithNotify(var2, var3, var4, 2);
++			if(var5 == 1) var1.setBlockMetadataWithNotify(var2, var3, var4, 1);
++			if(var5 == 2) var1.setBlockMetadataWithNotify(var2, var3, var4, 3);
++			if(var5 == 3) var1.setBlockMetadataWithNotify(var2, var3, var4, 0);
++		} else {
++			this.onNeighborBlockChange(var1, var2, var3, var4, 0);
++		}
+ 		this.modelBlock.onBlockAdded(var1, var2, var3, var4);
+ 	}
+ 
+@@ -225,12 +219,22 @@
+ 		this.modelBlock.onBlockRemoval(var1, var2, var3, var4);
+ 	}
+ 
+-	public void dropBlockAsItemWithChance(World var1, int var2, int var3, int var4, int var5, float var6) {
+-		this.modelBlock.dropBlockAsItemWithChance(var1, var2, var3, var4, var5, var6);
+-	}
+-
+ 	public void dropBlockAsItem(World var1, int var2, int var3, int var4, int var5) {
+-		this.modelBlock.dropBlockAsItem(var1, var2, var3, var4, var5);
++		this.dropBlockAsItemWithChance(var1, var2, var3, var4, var5, 1.0F);
++	}
++
++	public void dropBlockAsItemWithChance(World var1, int var2, int var3, int var4, int var5, float var6) {
++		if(!var1.multiplayerWorld) {
++			if(var1.rand.nextFloat() <= var6) {
++				float var7 = 0.7F;
++				double var8 = (double)(var1.rand.nextFloat() * var7) + (double)(1.0F - var7) * 0.5D;
++				double var10 = (double)(var1.rand.nextFloat() * var7) + (double)(1.0F - var7) * 0.5D;
++				double var12 = (double)(var1.rand.nextFloat() * var7) + (double)(1.0F - var7) * 0.5D;
++				EntityItem var14 = new EntityItem(var1, (double)var2 + var8, (double)var3 + var10, (double)var4 + var12, new ItemStack(this.blockID));
++				var14.delayBeforeCanPickup = 10;
++				var1.spawnEntityInWorld(var14);
++			}
++		}
+ 	}
+ 
+ 	public void onEntityWalking(World var1, int var2, int var3, int var4, Entity var5) {
+@@ -248,4 +252,41 @@
+ 	public void onBlockDestroyedByExplosion(World var1, int var2, int var3, int var4) {
+ 		this.modelBlock.onBlockDestroyedByExplosion(var1, var2, var3, var4);
+ 	}
++
++	public MovingObjectPosition collisionRayTrace(World var1, int var2, int var3, int var4, Vec3D var5, Vec3D var6) {
++		int var7 = var1.getBlockMetadata(var2, var3, var4);
++		MovingObjectPosition var8 = null;
++		MovingObjectPosition var9 = null;
++
++		if(var7 == 0) {
++			this.setBlockBounds(0.0F, 0.5F, 0.0F, 0.5F, 1.0F, 1.0F);
++			var8 = super.collisionRayTrace(var1, var2, var3, var4, var5, var6);
++			this.setBlockBounds(0.5F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
++			var9 = super.collisionRayTrace(var1, var2, var3, var4, var5, var6);
++		} else if(var7 == 1) {
++			this.setBlockBounds(0.0F, 0.0F, 0.0F, 0.5F, 1.0F, 1.0F);
++			var8 = super.collisionRayTrace(var1, var2, var3, var4, var5, var6);
++			this.setBlockBounds(0.5F, 0.5F, 0.0F, 1.0F, 1.0F, 1.0F);
++			var9 = super.collisionRayTrace(var1, var2, var3, var4, var5, var6);
++		} else if(var7 == 2) {
++			this.setBlockBounds(0.0F, 0.5F, 0.0F, 1.0F, 1.0F, 0.5F);
++			var8 = super.collisionRayTrace(var1, var2, var3, var4, var5, var6);
++			this.setBlockBounds(0.0F, 0.0F, 0.5F, 1.0F, 1.0F, 1.0F);
++			var9 = super.collisionRayTrace(var1, var2, var3, var4, var5, var6);
++		} else if(var7 == 3) {
++			this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 0.5F);
++			var8 = super.collisionRayTrace(var1, var2, var3, var4, var5, var6);
++			this.setBlockBounds(0.0F, 0.5F, 0.5F, 1.0F, 1.0F, 1.0F);
++			var9 = super.collisionRayTrace(var1, var2, var3, var4, var5, var6);
++		}
++
++		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
++
++		if(var8 == null) return var9;
++		if(var9 == null) return var8;
++
++		// Return whichever hit is closer to the player
++		return var5.distanceTo(var8.hitVec) < var5.distanceTo(var9.hitVec) ? var8 : var9;
++	}
++
+ }
+--- net/minecraft/client/Minecraft.java
++++ net/minecraft/client/Minecraft.java
+@@ -349,12 +349,16 @@
+ 			this.currentScreen = (GuiScreen)var1;
+ 			if(var1 != null) {
+ 				this.setIngameNotInFocus();
++				if(this.thePlayer != null && this.thePlayer.movementInput instanceof MovementInputFromOptions) {
++					((MovementInputFromOptions)this.thePlayer.movementInput).resetKeyState();
++				}
+ 				ScaledResolution var2 = new ScaledResolution(this.displayWidth, this.displayHeight);
+ 				int var3 = var2.getScaledWidth();
+ 				int var4 = var2.getScaledHeight();
+ 				((GuiScreen)var1).setWorldAndResolution(this, var3, var4);
+ 				this.skipRenderWorld = false;
+ 			} else {
++				this.leftClickCounter = 10;
+ 				this.setIngameFocus();
+ 			}
+ 
+@@ -493,10 +497,6 @@
+ 						this.resize(this.displayWidth, this.displayHeight);
+ 					}
+ 
+-					if(this.options.limitFramerate) {
+-						Thread.sleep(5L);
+-					}
+-
+ 					this.checkGLError("Post render");
+ 					++var3;
+ 
+@@ -591,11 +591,11 @@
+ 	}
+ 
+ 	public void setIngameNotInFocus() {
++
++		if(this.thePlayer != null) {
++			this.thePlayer.resetPlayerKeyState();
++		}
+ 		if(this.inGameHasFocus) {
+-			if(this.thePlayer != null) {
+-				this.thePlayer.resetPlayerKeyState();
+-			}
+-
+ 			this.inGameHasFocus = false;
+ 			this.mouseHelper.ungrabMouseCursor();
+ 		}
+@@ -657,8 +657,15 @@
+ 				} else {
+ 					ItemStack var7 = this.thePlayer.inventory.getCurrentItem();
+ 					int var8 = var7 != null ? var7.stackSize : 0;
+-					if(this.playerController.onPlayerRightClick(this.thePlayer, this.theWorld, var7, var2, var3, var4, var5)) {
++					boolean var11 = this.playerController.onPlayerRightClick(this.thePlayer, this.theWorld, var7, var2, var3, var4, var5);
++					if(var11) {
+ 						this.thePlayer.swingItem();
++						if(var7 != null && var7.stackSize == 0) {
++						this.thePlayer.inventory.mainInventory[this.thePlayer.inventory.currentItem] = null;
++						} else if(var7 != null && var7.stackSize != var8) {
++							this.entityRenderer.itemRenderer.resetEquippedProgress();
++						}
++						return;
+ 					}
+ 
+ 					if(var7 == null) {
+@@ -687,7 +694,6 @@
+ 					}
+ 				}
+ 			}
+-
+ 		}
+ 	}
+ 
+@@ -849,7 +855,16 @@
+ 												break label234;
+ 											}
+ 
+-											this.thePlayer.handleKeyPress(Keyboard.getEventKey(), Keyboard.getEventKeyState());
++											if(this.currentScreen == null) {
++												this.thePlayer.handleKeyPress(Keyboard.getEventKey(), Keyboard.getEventKeyState());
++											}
++											else {
++												if(this.thePlayer != null && this.thePlayer.movementInput instanceof MovementInputFromOptions) {
++													((MovementInputFromOptions)this.thePlayer.movementInput).resetKeyState();
++												}
++											}
++											this.setIngameFocus();
++
+ 										} while(!Keyboard.getEventKeyState());
+ 
+ 										if(Keyboard.getEventKey() == Keyboard.KEY_F11) {
+--- net/minecraft/src/InventoryPlayer.java
++++ net/minecraft/src/InventoryPlayer.java
+@@ -297,27 +297,15 @@
+ 	}
+ 
+ 	public int getTotalArmorValue() {
+-		int var1 = 0;
+-		int var2 = 0;
+-		int var3 = 0;
+-
+-		for(int var4 = 0; var4 < this.armorInventory.length; ++var4) {
+-			if(this.armorInventory[var4] != null && this.armorInventory[var4].getItem() instanceof ItemArmor) {
+-				int var5 = this.armorInventory[var4].getMaxDamage();
+-				int var6 = this.armorInventory[var4].itemDmg;
+-				int var7 = var5 - var6;
+-				var2 += var7;
+-				var3 += var5;
+-				int var8 = ((ItemArmor)this.armorInventory[var4].getItem()).damageReduceAmount;
+-				var1 += var8;
+-			}
+-		}
+-
+-		if(var3 == 0) {
+-			return 0;
+-		} else {
+-			return (var1 - 1) * var2 / var3 + 1;
+-		}
++    int total = 0;
++
++    for (int i = 0; i < this.armorInventory.length; ++i) {
++        if(this.armorInventory[i] != null && this.armorInventory[i].getItem() instanceof ItemArmor) {
++            total += ((ItemArmor)this.armorInventory[i].getItem()).damageReduceAmount;
++        }
++    }
++
++    return total;
+ 	}
+ 
+ 	public void damageArmor(int var1) {
+@@ -400,4 +388,56 @@
+ 
+ 		return var1;
+ 	}
++
++	public int getArmorDisplayValue() {
++    int total = 0;
++
++    for (int i = 0; i < this.armorInventory.length; ++i) {
++        ItemStack stack = this.armorInventory[i];
++
++        if (stack != null && stack.getItem() instanceof ItemArmor) {
++            ItemArmor armor = (ItemArmor)stack.getItem();
++            int slot = armor.armorType; // 0=helmet, 1=chest, 2=legs, 3=boots
++
++            switch (armor.renderIndex) {
++                case 0: // leather
++                    if (slot == 0) total += 1;
++                    else if (slot == 1) total += 3;
++                    else if (slot == 2) total += 2;
++                    else if (slot == 3) total += 1;
++                    break;
++
++                case 1: // chain
++                    if (slot == 0) total += 2;
++                    else if (slot == 1) total += 5;
++                    else if (slot == 2) total += 4;
++                    else if (slot == 3) total += 1;
++                    break;
++
++                case 2: // iron
++                    if (slot == 0) total += 2;
++                    else if (slot == 1) total += 6;
++                    else if (slot == 2) total += 5;
++                    else if (slot == 3) total += 2;
++                    break;
++
++                case 3: // diamond
++                    if (slot == 0) total += 3;
++                    else if (slot == 1) total += 8;
++                    else if (slot == 2) total += 6;
++                    else if (slot == 3) total += 3;
++                    break;
++
++                case 4: // gold
++                    if (slot == 0) total += 2;
++                    else if (slot == 1) total += 5;
++                    else if (slot == 2) total += 3;
++                    else if (slot == 3) total += 1;
++                    break;
++            }
++        }
++    }
++
++    return total;
++    }
+ }
+--- net/minecraft/src/BlockPressurePlate.java
++++ net/minecraft/src/BlockPressurePlate.java
+@@ -138,6 +138,20 @@
+ 		return true;
+ 	}
+ 
++	public float blockStrength(EntityPlayer var1) {
++		if(this.blockID == Block.pressurePlateWood.blockID) {
++			ItemStack held = var1.inventory.getCurrentItem();
++			if(held != null && held.getItem() instanceof ItemAxe) {
++				return var1.getCurrentPlayerStrVsBlock(this) / this.hardness / 30.0F;
++			}
++		}
++		return super.blockStrength(var1);
++	}
++
++	public int quantityDropped(Random rand) {
++		return 1;
++	}
++
+ 	public void setBlockBoundsForItemRender() {
+ 		float var1 = 0.5F;
+ 		float var2 = 2.0F / 16.0F;
+--- /dev/null
++++ net/minecraft/src/BlockPlacementHelper.java
+@@ -1,0 +1,5 @@
++package net.minecraft.src;
++
++public class BlockPlacementHelper {
++    public static EntityPlayer placingPlayer = null;
++}
+--- net/minecraft/src/BlockStep.java
++++ net/minecraft/src/BlockStep.java
+@@ -56,4 +56,8 @@
+ 
+ 		return var5 == 1 ? true : (!super.shouldSideBeRendered(var1, var2, var3, var4, var5) ? false : (var5 == 0 ? true : var1.getBlockId(var2, var3, var4) != this.blockID));
+ 	}
++
++	public int quantityDropped(Random rand) {
++		return this.blockType ? 2 : 1;
++	}
+ }
+--- net/minecraft/src/Entity.java
++++ net/minecraft/src/Entity.java
+@@ -377,32 +377,37 @@
+ 
+ 			var37 = this.posX - var7;
+ 			var23 = this.posZ - var9;
+-			this.distanceWalkedModified = (float)((double)this.distanceWalkedModified + (double)MathHelper.sqrt_double(var37 * var37 + var23 * var23) * 0.6D);
+-			int var26;
+-			int var38;
+-			int var40;
+-			if(this.canTriggerWalking && !var18) {
+-				var38 = MathHelper.floor_double(this.posX);
+-				var26 = MathHelper.floor_double(this.posY - (double)0.2F - (double)this.yOffset);
+-				var40 = MathHelper.floor_double(this.posZ);
+-				var28 = this.worldObj.getBlockId(var38, var26, var40);
+-				if(this.distanceWalkedModified > (float)this.nextStepDistance && var28 > 0) {
+-					++this.nextStepDistance;
+-					StepSound var29 = Block.blocksList[var28].stepSound;
+-					if(this.worldObj.getBlockId(var38, var26 + 1, var40) == Block.snow.blockID) {
+-						var29 = Block.snow.stepSound;
+-						this.worldObj.playSoundAtEntity(this, var29.getStepSound(), var29.getVolume() * 0.15F, var29.getPitch());
+-					} else if(!Block.blocksList[var28].material.getIsLiquid()) {
+-						this.worldObj.playSoundAtEntity(this, var29.getStepSound(), var29.getVolume() * 0.15F, var29.getPitch());
++
++			if(!var18) {
++				this.distanceWalkedModified = (float)((double)this.distanceWalkedModified + (double)MathHelper.sqrt_double(var37 * var37 + var23 * var23) * 0.6D);
++				int var38;
++				int var26;
++				int var40;
++				if(this.canTriggerWalking) {
++					var38 = MathHelper.floor_double(this.posX);
++					var26 = MathHelper.floor_double(this.posY - (double)0.2F - (double)this.yOffset);
++					var40 = MathHelper.floor_double(this.posZ);
++					var28 = this.worldObj.getBlockId(var38, var26, var40);
++					if(this.distanceWalkedModified > (float)this.nextStepDistance && var28 > 0) {
++						++this.nextStepDistance;
++						StepSound var29 = Block.blocksList[var28].stepSound;
++						if(this.worldObj.getBlockId(var38, var26 + 1, var40) == Block.snow.blockID) {
++							var29 = Block.snow.stepSound;
++							this.worldObj.playSoundAtEntity(this, var29.getStepSound(), var29.getVolume() * 0.15F, var29.getPitch());
++						} else if(!Block.blocksList[var28].material.getIsLiquid()) {
++							this.worldObj.playSoundAtEntity(this, var29.getStepSound(), var29.getVolume() * 0.15F, var29.getPitch());
++						}
++
++						Block.blocksList[var28].onEntityWalking(this.worldObj, var38, var26, var40, this);
+ 					}
+-
+-					Block.blocksList[var28].onEntityWalking(this.worldObj, var38, var26, var40, this);
+ 				}
++			} else {
++				this.nextStepDistance = (int)this.distanceWalkedModified + 1;
+ 			}
+ 
+-			var38 = MathHelper.floor_double(this.boundingBox.minX);
+-			var26 = MathHelper.floor_double(this.boundingBox.minY);
+-			var40 = MathHelper.floor_double(this.boundingBox.minZ);
++			int var38 = MathHelper.floor_double(this.boundingBox.minX);
++			int var26 = MathHelper.floor_double(this.boundingBox.minY);
++			int var40 = MathHelper.floor_double(this.boundingBox.minZ);
+ 			var28 = MathHelper.floor_double(this.boundingBox.maxX);
+ 			int var41 = MathHelper.floor_double(this.boundingBox.maxY);
+ 			int var30 = MathHelper.floor_double(this.boundingBox.maxZ);
+@@ -436,7 +441,6 @@
+ 				this.worldObj.playSoundAtEntity(this, "random.fizz", 0.7F, 1.6F + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.4F);
+ 				this.fire = -this.fireResistance;
+ 			}
+-
+ 		}
+ 	}
+ 
+--- net/minecraft/src/ItemAxe.java
++++ net/minecraft/src/ItemAxe.java
+@@ -1,9 +1,15 @@
+ package net.minecraft.src;
+ 
+ public class ItemAxe extends ItemTool {
+-	private static Block[] blocksEffectiveAgainst = new Block[]{Block.planks, Block.bookshelf, Block.wood, Block.chest};
++	private static Block[] blocksEffectiveAgainst = new Block[]{Block.planks, Block.bookshelf, Block.wood, Block.chest, Block.fence, Block.workbench, Block.stairCompactWood, Block.doorWood, Block.signStanding, Block.signWall, Block.ladder, Block.pressurePlateWood, Block.jukebox};
+ 
+ 	public ItemAxe(int var1, int var2) {
+ 		super(var1, 3, var2, blocksEffectiveAgainst);
+ 	}
++
++	public boolean canHarvestBlock(Block block) {
++		return block == Block.pressurePlateWood || super.canHarvestBlock(block);
++	}
++
++
+ }
+--- net/minecraft/src/BlockBookshelf.java
++++ net/minecraft/src/BlockBookshelf.java
+@@ -11,7 +11,11 @@
+ 		return var1 <= 1 ? 4 : this.blockIndexInTexture;
+ 	}
+ 
++	public int idDropped(int var1, Random var2) {
++		return this.blockID;
++	}
++
+ 	public int quantityDropped(Random var1) {
+-		return 0;
++		return 1;
+ 	}
+ }
+--- net/minecraft/src/ItemPickaxe.java
++++ net/minecraft/src/ItemPickaxe.java
+@@ -1,7 +1,7 @@
+ package net.minecraft.src;
+ 
+ public class ItemPickaxe extends ItemTool {
+-	private static Block[] blocksEffectiveAgainst = new Block[]{Block.cobblestone, Block.stairDouble, Block.stairSingle, Block.stone, Block.cobblestoneMossy, Block.oreIron, Block.blockSteel, Block.oreCoal, Block.blockGold, Block.oreGold, Block.oreDiamond, Block.blockDiamond, Block.ice};
++	private static Block[] blocksEffectiveAgainst = new Block[]{Block.cobblestone, Block.stairDouble, Block.stairSingle, Block.stone, Block.cobblestoneMossy, Block.oreIron, Block.blockSteel, Block.oreCoal, Block.blockGold, Block.oreGold, Block.oreDiamond, Block.blockDiamond, Block.oreRedstone, Block.oreRedstoneGlowing, Block.stoneOvenIdle, Block.stoneOvenActive, Block.ice, Block.brick, Block.pressurePlateStone, Block.doorSteel, Block.stairCompactStone};
+ 	private int harvestLevel;
+ 
+ 	public ItemPickaxe(int var1, int var2) {
+--- net/minecraft/src/Render.java
++++ net/minecraft/src/Render.java
+@@ -120,10 +120,10 @@
+ 				double var26 = (double)var9 + var1.minY + var15 + 1.0D / 64.0D;
+ 				double var28 = (double)var10 + var1.minZ + var17;
+ 				double var30 = (double)var10 + var1.maxZ + var17;
+-				float var32 = (float)((var2 - var22) / 2.0D / (double)var12 + 0.5D);
+-				float var33 = (float)((var2 - var24) / 2.0D / (double)var12 + 0.5D);
+-				float var34 = (float)((var6 - var28) / 2.0D / (double)var12 + 0.5D);
+-				float var35 = (float)((var6 - var30) / 2.0D / (double)var12 + 0.5D);
++				float var32 = (float)(((var2 - var13) - ((double)var8 + var1.minX)) / 2.0D / (double)var12 + 0.5D);
++				float var33 = (float)(((var2 - var13) - ((double)var8 + var1.maxX)) / 2.0D / (double)var12 + 0.5D);
++				float var34 = (float)(((var6 - var17) - ((double)var10 + var1.minZ)) / 2.0D / (double)var12 + 0.5D);
++				float var35 = (float)(((var6 - var17) - ((double)var10 + var1.maxZ)) / 2.0D / (double)var12 + 0.5D);
+ 				var19.addVertexWithUV(var22, var26, var28, (double)var32, (double)var34);
+ 				var19.addVertexWithUV(var22, var26, var30, (double)var32, (double)var35);
+ 				var19.addVertexWithUV(var24, var26, var30, (double)var33, (double)var35);
+--- net/minecraft/src/Item.java
++++ net/minecraft/src/Item.java
+@@ -72,14 +72,14 @@
+ 	public static Item porkCooked = (new ItemFood(64, 8)).setIconIndex(88);
+ 	public static Item painting = (new ItemPainting(65)).setIconIndex(26);
+ 	public static Item appleGold = (new ItemFood(66, 42)).setIconIndex(11);
+-	public static Item sign = (new ItemSign(67)).setIconIndex(42);
+-	public static Item doorWood = (new ItemDoor(68, Material.wood)).setIconIndex(43);
++	public static Item sign = (new ItemSign(67)).setIconIndex(42).setMaxStackSize(16);
++	public static Item doorWood = (new ItemDoor(68, Material.wood)).setIconIndex(43).setMaxStackSize(16);
+ 	public static Item bucketEmpty = (new ItemBucket(69, 0)).setIconIndex(74);
+ 	public static Item bucketWater = (new ItemBucket(70, Block.waterMoving.blockID)).setIconIndex(75);
+ 	public static Item bucketLava = (new ItemBucket(71, Block.lavaMoving.blockID)).setIconIndex(76);
+ 	public static Item minecartEmpty = (new ItemMinecart(72, 0)).setIconIndex(135);
+ 	public static Item saddle = (new ItemSaddle(73)).setIconIndex(104);
+-	public static Item doorSteel = (new ItemDoor(74, Material.iron)).setIconIndex(44);
++	public static Item doorSteel = (new ItemDoor(74, Material.iron)).setIconIndex(44).setMaxStackSize(16);
+ 	public static Item redstone = (new ItemRedstone(75)).setIconIndex(56);
+ 	public static Item snowball = (new ItemSnowball(76)).setIconIndex(14);
+ 	public static Item boat = (new ItemBoat(77)).setIconIndex(136);
+@@ -139,7 +139,7 @@
+ 	}
+ 
+ 	public int getMaxDamage() {
+-		return this.maxDamage;
++		return this.maxDamage*2;
+ 	}
+ 
+ 	public void hitEntity(ItemStack var1, EntityLiving var2) {
+@@ -167,4 +167,10 @@
+ 	public boolean isFull3D() {
+ 		return this.bFull3D;
+ 	}
++
++	public Item setMaxStackSize(int size) {
++		this.maxStackSize = size;
++		return this;
++	}
++
+ }
+--- net/minecraft/src/BlockFurnace.java
++++ net/minecraft/src/BlockFurnace.java
+@@ -21,28 +21,24 @@
+ 	}
+ 
+ 	private void setDefaultDirection(World var1, int var2, int var3, int var4) {
+-		int var5 = var1.getBlockId(var2, var3, var4 - 1);
+-		int var6 = var1.getBlockId(var2, var3, var4 + 1);
+-		int var7 = var1.getBlockId(var2 - 1, var3, var4);
+-		int var8 = var1.getBlockId(var2 + 1, var3, var4);
+-		byte var9 = 3;
+-		if(Block.opaqueCubeLookup[var5] && !Block.opaqueCubeLookup[var6]) {
+-			var9 = 3;
+-		}
+-
+-		if(Block.opaqueCubeLookup[var6] && !Block.opaqueCubeLookup[var5]) {
+-			var9 = 2;
+-		}
+-
+-		if(Block.opaqueCubeLookup[var7] && !Block.opaqueCubeLookup[var8]) {
+-			var9 = 5;
+-		}
+-
+-		if(Block.opaqueCubeLookup[var8] && !Block.opaqueCubeLookup[var7]) {
+-			var9 = 4;
+-		}
+-
+-		var1.setBlockMetadataWithNotify(var2, var3, var4, var9);
++		if(BlockPlacementHelper.placingPlayer != null) {
++			int var5 = MathHelper.floor_double((double)(BlockPlacementHelper.placingPlayer.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
++			if(var5 == 0) var1.setBlockMetadataWithNotify(var2, var3, var4, 2);
++			if(var5 == 1) var1.setBlockMetadataWithNotify(var2, var3, var4, 5);
++			if(var5 == 2) var1.setBlockMetadataWithNotify(var2, var3, var4, 3);
++			if(var5 == 3) var1.setBlockMetadataWithNotify(var2, var3, var4, 4);
++		} else {
++			int var5 = var1.getBlockId(var2, var3, var4 - 1);
++			int var6 = var1.getBlockId(var2, var3, var4 + 1);
++			int var7 = var1.getBlockId(var2 - 1, var3, var4);
++			int var8 = var1.getBlockId(var2 + 1, var3, var4);
++			byte var9 = 3;
++			if(Block.opaqueCubeLookup[var5] && !Block.opaqueCubeLookup[var6]) { var9 = 3; }
++			if(Block.opaqueCubeLookup[var6] && !Block.opaqueCubeLookup[var5]) { var9 = 2; }
++			if(Block.opaqueCubeLookup[var7] && !Block.opaqueCubeLookup[var8]) { var9 = 5; }
++			if(Block.opaqueCubeLookup[var8] && !Block.opaqueCubeLookup[var7]) { var9 = 4; }
++			var1.setBlockMetadataWithNotify(var2, var3, var4, var9);
++		}
+ 	}
+ 
+ 	public int getBlockTexture(IBlockAccess var1, int var2, int var3, int var4, int var5) {
+--- net/minecraft/src/RenderItem.java
++++ net/minecraft/src/RenderItem.java
+@@ -10,6 +10,7 @@
+ 
+ 	public RenderItem() {
+ 		this.shadowSize = 0.15F;
++		//Debug: Fixed this
+ 		this.shadowOpaque = 12.0F / 16.0F;
+ 	}
+ 
+--- net/minecraft/src/BlockFarmland.java
++++ net/minecraft/src/BlockFarmland.java
+@@ -44,6 +44,9 @@
+ 	}
+ 
+ 	public void onEntityWalking(World var1, int var2, int var3, int var4, Entity var5) {
++		if(var1.getBlockId(var2, var3 - 1, var4) == Block.fence.blockID) {
++			return;
++		}
+ 		if(var1.rand.nextInt(4) == 0) {
+ 			var1.setBlockWithNotify(var2, var3, var4, Block.dirt.blockID);
+ 		}
+--- net/minecraft/src/GameSettings.java
++++ net/minecraft/src/GameSettings.java
+@@ -18,14 +18,13 @@
+ 	public int renderDistance = 0;
+ 	public boolean viewBobbing = true;
+ 	public boolean anaglyph = false;
+-	public boolean limitFramerate = false;
+ 	public boolean fancyGraphics = true;
+ 	public KeyBinding keyBindForward = new KeyBinding("Forward", 17);
+ 	public KeyBinding keyBindLeft = new KeyBinding("Left", 30);
+ 	public KeyBinding keyBindBack = new KeyBinding("Back", 31);
+ 	public KeyBinding keyBindRight = new KeyBinding("Right", 32);
+ 	public KeyBinding keyBindJump = new KeyBinding("Jump", 57);
+-	public KeyBinding keyBindInventory = new KeyBinding("Inventory", 23);
++	public KeyBinding keyBindInventory = new KeyBinding("Inventory", 18);
+ 	public KeyBinding keyBindDrop = new KeyBinding("Drop", 16);
+ 	public KeyBinding keyBindChat = new KeyBinding("Chat", 20);
+ 	public KeyBinding keyBindToggleFog = new KeyBinding("Toggle fog", 33);
+@@ -33,7 +32,7 @@
+ 	public KeyBinding[] keyBindings = new KeyBinding[]{this.keyBindForward, this.keyBindLeft, this.keyBindBack, this.keyBindRight, this.keyBindJump, this.keyBindSneak, this.keyBindDrop, this.keyBindInventory, this.keyBindChat, this.keyBindToggleFog};
+ 	protected Minecraft mc;
+ 	private File optionsFile;
+-	public int numberOfOptions = 10;
++	public int numberOfOptions = 9;
+ 	public int difficulty = 2;
+ 	public boolean thirdPersonView = false;
+ 
+@@ -90,10 +89,6 @@
+ 			this.mc.renderEngine.refreshTextures();
+ 		}
+ 
+-		if(var1 == 7) {
+-			this.limitFramerate = !this.limitFramerate;
+-		}
+-
+ 		if(var1 == 8) {
+ 			this.difficulty = this.difficulty + var2 & 3;
+ 		}
+@@ -115,7 +110,7 @@
+ 	}
+ 
+ 	public String getOptionDisplayString(int var1) {
+-		return var1 == 0 ? "Music: " + (this.musicVolume > 0.0F ? (int)(this.musicVolume * 100.0F) + "%" : "OFF") : (var1 == 1 ? "Sound: " + (this.soundVolume > 0.0F ? (int)(this.soundVolume * 100.0F) + "%" : "OFF") : (var1 == 2 ? "Invert mouse: " + (this.invertMouse ? "ON" : "OFF") : (var1 == 3 ? (this.mouseSensitivity == 0.0F ? "Sensitivity: *yawn*" : (this.mouseSensitivity == 1.0F ? "Sensitivity: HYPERSPEED!!!" : "Sensitivity: " + (int)(this.mouseSensitivity * 200.0F) + "%")) : (var1 == 4 ? "Render distance: " + RENDER_DISTANCES[this.renderDistance] : (var1 == 5 ? "View bobbing: " + (this.viewBobbing ? "ON" : "OFF") : (var1 == 6 ? "3d anaglyph: " + (this.anaglyph ? "ON" : "OFF") : (var1 == 7 ? "Limit framerate: " + (this.limitFramerate ? "ON" : "OFF") : (var1 == 8 ? "Difficulty: " + DIFFICULTY_LEVELS[this.difficulty] : (var1 == 9 ? "Graphics: " + (this.fancyGraphics ? "FANCY" : "FAST") : "")))))))));
++		return var1 == 0 ? "Music: " + (this.musicVolume > 0.0F ? (int)(this.musicVolume * 100.0F) + "%" : "OFF") : (var1 == 1 ? "Sound: " + (this.soundVolume > 0.0F ? (int)(this.soundVolume * 100.0F) + "%" : "OFF") : (var1 == 2 ? "Invert mouse: " + (this.invertMouse ? "ON" : "OFF") : (var1 == 3 ? (this.mouseSensitivity == 0.0F ? "Sensitivity: *yawn*" : (this.mouseSensitivity == 1.0F ? "Sensitivity: HYPERSPEED!!!" : "Sensitivity: " + (int)(this.mouseSensitivity * 200.0F) + "%")) : (var1 == 4 ? "Render distance: " + RENDER_DISTANCES[this.renderDistance] : (var1 == 5 ? "View bobbing: " + (this.viewBobbing ? "ON" : "OFF") : (var1 == 6 ? "3d anaglyph: " + (this.anaglyph ? "ON" : "OFF") : (var1 == 7 ? "Difficulty: " + DIFFICULTY_LEVELS[this.difficulty] : (var1 == 8 ? "Graphics: " + (this.fancyGraphics ? "FANCY" : "FAST") : ""))))))));
+ 	}
+ 
+ 	public void loadOptions() {
+@@ -163,10 +158,6 @@
+ 					this.anaglyph = var3[1].equals("true");
+ 				}
+ 
+-				if(var3[0].equals("limitFramerate")) {
+-					this.limitFramerate = var3[1].equals("true");
+-				}
+-
+ 				if(var3[0].equals("difficulty")) {
+ 					this.difficulty = Integer.parseInt(var3[1]);
+ 				}
+@@ -202,7 +193,6 @@
+ 			var1.println("viewDistance:" + this.renderDistance);
+ 			var1.println("bobView:" + this.viewBobbing);
+ 			var1.println("anaglyph3d:" + this.anaglyph);
+-			var1.println("limitFramerate:" + this.limitFramerate);
+ 			var1.println("difficulty:" + this.difficulty);
+ 			var1.println("fancyGraphics:" + this.fancyGraphics);
+ 
+--- net/minecraft/src/BlockCactus.java
++++ net/minecraft/src/BlockCactus.java
+@@ -81,6 +81,9 @@
+ 	}
+ 
+ 	public void onEntityCollidedWithBlock(World var1, int var2, int var3, int var4, Entity var5) {
++		if(var5 instanceof EntityItem && ((EntityItem)var5).item.itemID == Block.cactus.blockID) {
++			return;
++		}
+ 		var5.attackEntityFrom((Entity)null, 1);
+ 	}
+ }
