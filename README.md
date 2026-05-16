@@ -39,7 +39,6 @@ This project aims to provide **minimal improvement**, focused strictly on small 
 - Doubled the durability of all tools and armor.
 - Stack sizes of Wooden Doors, Iron Doors, and Signs have been increased to 16.
 - Stack sizes of Porkchops and Cooked Porkchops have been increased to 8.
-- The default Inventory key is now 'E'.
 - Pickaxes and axes now correctly break their intended blocks.
 - Double slabs now drop 2 slabs when broken.
 - Stairs will now drop the stair block when broken.
