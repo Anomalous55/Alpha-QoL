@@ -51,7 +51,6 @@ This project aims to provide **minimal improvement**, focused strictly on small 
 - Fixed a bug where multiple item shadows would render while Fancy Graphics are enabled.
 - Fixed the orientation of stairs, furnaces, chests, and double chests.
 - Fixed the hitbox of stairs.
-- New Splashes!
 - Removed the 'Limit FPS' option as it doesn't really do anything useful.
 - Removed Herobrine 
 
