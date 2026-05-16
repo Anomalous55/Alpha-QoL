@@ -28,7 +28,9 @@ This project aims to provide **minimal improvement**, focused strictly on small 
 
 ## Change List (as of the most recent version)
 
-- Added XYZ Coordinates to F3 Menu. No more NBT Editor needed!
+- Added XYZ Coordinates to F3 Menu.
+- Added World Seed to F3 Menu
+- Added a secret method you may be familiar with to prevent farmland from being trampled.
 - Armor defense values are no longer tied to durability.
 - Defense Level now properly displays on the GUI.
 - You can now swap items of the same kind in the inventory.
@@ -40,12 +42,15 @@ This project aims to provide **minimal improvement**, focused strictly on small 
 - The default Inventory key is now 'E'.
 - Pickaxes and axes now correctly break their intended blocks.
 - Double slabs now drop 2 slabs when broken.
+- Stairs will now drop the stair block when broken.
 - Saddled Pigs will now drop their saddle when killed.
 - Falling Snow in Winter Mode worlds now has a less obtrusive texture.  
 - Fixed a bug where pressing a movement key and the Inventory key at the same time would cause you to move until the 'ESC' key is pressed.
 - Fixed a bug where liquids would be placed when interacting with a block.
 - Fixed a bug where instantly breakable blocks would be broken open returning to game from pause menu.
 - Fixed a bug where multiple item shadows would render while Fancy Graphics are enabled.
+- Fixed the orientation of stairs, furnaces, chests, and double chests.
+- Fixed the hitbox of stairs.
 - New Splashes!
 - Removed the 'Limit FPS' option as it doesn't really do anything useful.
 - Removed Herobrine
