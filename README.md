@@ -39,7 +39,8 @@ This project aims to provide **minimal improvement**, focused strictly on small 
 - Doubled the durability of all tools and armor.
 - Stack sizes of Wooden Doors, Iron Doors, and Signs have been increased to 16.
 - Stack sizes of Porkchops and Cooked Porkchops have been increased to 8.
-- Pickaxes and axes now correctly break their intended blocks.
+- The default Inventory key is now 'E'.
+- Pickaxes, axes, and spades now correctly break their intended blocks.
 - Double slabs now drop 2 slabs when broken.
 - Stairs will now drop the stair block when broken.
 - Saddled Pigs will now drop their saddle when killed.
@@ -52,8 +53,9 @@ This project aims to provide **minimal improvement**, focused strictly on small 
 - Fixed the hitbox of stairs.
 - New Splashes!
 - Removed the 'Limit FPS' option as it doesn't really do anything useful.
-- Removed Herobrine
-  
+- Removed Herobrine 
+
+
 ---
 
 ## Installation
