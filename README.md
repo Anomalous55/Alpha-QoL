@@ -32,8 +32,6 @@ This project aims to provide **minimal improvement**, focused strictly on small 
 - Added World Seed to F3 Menu.
 - Added Day Counter to F3 Menu.
 - Added a secret method you may be familiar with to prevent farmland from being trampled.
-- Armor defense values are no longer tied to durability.
-- Defense Level now properly displays on the GUI.
 - You can now swap items of the same kind in the inventory.
 - You can no longer eat food while your health is full.
 - Cacti will no longer destroy dropped Cactus items.
@@ -56,7 +54,6 @@ This project aims to provide **minimal improvement**, focused strictly on small 
 - Fixed the hitbox of stairs.
 - Removed the 'Limit FPS' option as it doesn't really do anything useful.
 - Removed Herobrine 
-
 
 ---
 
