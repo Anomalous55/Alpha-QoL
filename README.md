@@ -28,29 +28,29 @@ This project aims to provide **minimal improvement**, focused strictly on small 
 
 ## Change List (as of the most recent version)
 
-- + Added XYZ Coordinates, World Seed, and a Day Counter to F3 Menu.
-- + Added a secret method you may be familiar with from Beta to prevent farmland from being trampled.
-- + Added an FPS Limiter slider to the options menu to set max framerate more accurately (Replaces the 'Limit FPS' option).
-- * You can now swap items of the same kind in the inventory.
-- * You can no longer accidentally eat food while your health is full.
-- * Cacti will no longer destroy dropped Cactus items.
-- * Doubled the durability of all tools and armor.
-- * Stack sizes of Wooden Doors, Iron Doors, and Signs have been increased to 16.
-- * Pickaxes, axes, and spades now correctly break their intended blocks.
-- * Saddled Pigs will now drop their saddle when killed.
-- * Double slabs now drop both slabs when broken.
-- * Pressure Plates, Bookshelves, and Stairs now properly drop themselves when broken.
-- * Falling Snow in Winter Mode worlds now has a less obtrusive texture.
-- * Made the UI a little bit snappier (by fixing a bug where player inputs were skipped).
-- * Music now plays roughly twice as often (Music is still semi-random with intervals of about 10-15 minutes instead of 20-25 minutes).
-- * Fixed a bug where pressing a movement key and the Inventory key at the same time would cause you to move until the 'ESC' key is pressed.
-- * Fixed a bug where liquids would be placed when interacting with a block.
-- * Fixed a bug where instantly breakable blocks would be broken open returning to game from pause menu.
-- * Fixed a bug where multiple item shadows would render while Fancy Graphics are enabled.
-- * Fixed a bug where your footsteps all play at once after sneaking.
-- * Fixed the orientation of stairs, furnaces, chests, and double chests.
-- * Fixed the hitbox of stairs.
-- - Removed Herobrine 
+- Added XYZ Coordinates, World Seed, and a Day Counter to F3 Menu.
+- Added a secret method you may be familiar with from Beta to prevent farmland from being trampled.
+- Added an FPS Limiter slider to the options menu to set max framerate more accurately (Replaces the 'Limit FPS' option).
+- You can now swap items of the same kind in the inventory.
+- You can no longer accidentally eat food while your health is full.
+- Cacti will no longer destroy dropped Cactus items.
+- Doubled the durability of all tools and armor.
+- Stack sizes of Wooden Doors, Iron Doors, and Signs have been increased to 16.
+- Pickaxes, axes, and spades now correctly break their intended blocks.
+- Saddled Pigs will now drop their saddle when killed.
+- Double slabs now drop both slabs when broken.
+- Pressure Plates, Bookshelves, and Stairs now properly drop themselves when broken.
+- Falling Snow in Winter Mode worlds now has a less obtrusive texture.
+- Made the UI a little bit snappier (by fixing a bug where player inputs were skipped).
+- Music now plays roughly twice as often (Music is still semi-random with intervals of about 10-15 minutes instead of 20-25 minutes).
+- Fixed a bug where pressing a movement key and the Inventory key at the same time would cause you to move until the 'ESC' key is pressed.
+- Fixed a bug where liquids would be placed when interacting with a block.
+- Fixed a bug where instantly breakable blocks would be broken open returning to game from pause menu.
+- Fixed a bug where multiple item shadows would render while Fancy Graphics are enabled.
+- Fixed a bug where your footsteps all play at once after sneaking.
+- Fixed the orientation of stairs, furnaces, chests, and double chests.
+- Fixed the hitbox of stairs.
+- Removed Herobrine 
 
 ---
 
