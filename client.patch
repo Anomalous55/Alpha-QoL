@@ -606,7 +606,17 @@
  				this.setIngameFocus();
  			}
  
-@@ -493,10 +497,6 @@
+@@ -479,6 +483,9 @@
+ 
+ 					Thread.yield();
+ 					Display.update();
++					if(this.options.fpsLimit < 256) {
++						Display.sync(this.options.fpsLimit);
++					}
+ 					if(this.mcCanvas != null && !this.fullscreen && (this.mcCanvas.getWidth() != this.displayWidth || this.mcCanvas.getHeight() != this.displayHeight)) {
+ 						this.displayWidth = this.mcCanvas.getWidth();
+ 						this.displayHeight = this.mcCanvas.getHeight();
+@@ -493,10 +500,6 @@
  						this.resize(this.displayWidth, this.displayHeight);
  					}
  
@@ -617,7 +627,7 @@
  					this.checkGLError("Post render");
  					++var3;
  
-@@ -591,11 +591,11 @@
+@@ -591,11 +594,11 @@
  	}
  
  	public void setIngameNotInFocus() {
@@ -633,7 +643,7 @@
  			this.inGameHasFocus = false;
  			this.mouseHelper.ungrabMouseCursor();
  		}
-@@ -657,8 +657,15 @@
+@@ -657,8 +660,15 @@
  				} else {
  					ItemStack var7 = this.thePlayer.inventory.getCurrentItem();
  					int var8 = var7 != null ? var7.stackSize : 0;
@@ -650,7 +660,7 @@
  					}
  
  					if(var7 == null) {
-@@ -687,7 +694,6 @@
+@@ -687,7 +697,6 @@
  					}
  				}
  			}
@@ -658,20 +668,19 @@
  		}
  	}
  
-@@ -849,7 +855,16 @@
+@@ -849,7 +858,15 @@
  												break label234;
  											}
  
 -											this.thePlayer.handleKeyPress(Keyboard.getEventKey(), Keyboard.getEventKeyState());
 +											if(this.currentScreen == null) {
 +												this.thePlayer.handleKeyPress(Keyboard.getEventKey(), Keyboard.getEventKeyState());
-+											}
-+											else {
++												this.setIngameFocus();
++											} else {
 +												if(this.thePlayer != null && this.thePlayer.movementInput instanceof MovementInputFromOptions) {
 +													((MovementInputFromOptions)this.thePlayer.movementInput).resetKeyState();
 +												}
 +											}
-+											this.setIngameFocus();
 +
  										} while(!Keyboard.getEventKeyState());
  
@@ -957,16 +966,26 @@
  	}
  
  	public int getBlockTexture(IBlockAccess var1, int var2, int var3, int var4, int var5) {
---- net/minecraft/src/RenderItem.java
-+++ net/minecraft/src/RenderItem.java
-@@ -10,6 +10,7 @@
+--- net/minecraft/src/SoundManager.java
++++ net/minecraft/src/SoundManager.java
+@@ -17,7 +17,7 @@
+ 	private GameSettings options;
+ 	private static boolean loaded = false;
+ 	private Random rand = new Random();
+-	private int ticksBeforeMusic = this.rand.nextInt(12000);
++	private int ticksBeforeMusic = this.rand.nextInt(2400);
  
- 	public RenderItem() {
- 		this.shadowSize = 0.15F;
-+		//Debug: Fixed this
- 		this.shadowOpaque = 12.0F / 16.0F;
- 	}
+ 	public void loadSoundSettings(GameSettings var1) {
+ 		this.soundPoolStreaming.isGetRandomSound = false;
+@@ -93,7 +93,7 @@
  
+ 				SoundPoolEntry var1 = this.soundPoolMusic.getRandomSound();
+ 				if(var1 != null) {
+-					this.ticksBeforeMusic = this.rand.nextInt(24000) + 24000;
++					this.ticksBeforeMusic = this.rand.nextInt(12000) + 12000;
+ 					sndSystem.backgroundMusic("BgMusic", var1.soundUrl, var1.soundName, false);
+ 					sndSystem.setVolume("BgMusic", this.options.musicVolume);
+ 					sndSystem.play("BgMusic");
 --- net/minecraft/src/BlockFarmland.java
 +++ net/minecraft/src/BlockFarmland.java
 @@ -44,6 +44,9 @@
@@ -997,36 +1016,71 @@
  	public KeyBinding keyBindDrop = new KeyBinding("Drop", 16);
  	public KeyBinding keyBindChat = new KeyBinding("Chat", 20);
  	public KeyBinding keyBindToggleFog = new KeyBinding("Toggle fog", 33);
-@@ -33,7 +32,7 @@
- 	public KeyBinding[] keyBindings = new KeyBinding[]{this.keyBindForward, this.keyBindLeft, this.keyBindBack, this.keyBindRight, this.keyBindJump, this.keyBindSneak, this.keyBindDrop, this.keyBindInventory, this.keyBindChat, this.keyBindToggleFog};
- 	protected Minecraft mc;
+@@ -35,6 +34,7 @@
  	private File optionsFile;
--	public int numberOfOptions = 10;
-+	public int numberOfOptions = 9;
+ 	public int numberOfOptions = 10;
  	public int difficulty = 2;
++	public int fpsLimit = 60;
  	public boolean thirdPersonView = false;
  
-@@ -90,10 +89,6 @@
- 			this.mc.renderEngine.refreshTextures();
+ 	public GameSettings(Minecraft var1, File var2) {
+@@ -70,6 +70,10 @@
+ 			this.mouseSensitivity = var2;
  		}
  
--		if(var1 == 7) {
++		if(var1 == 9) {
++			this.fpsLimit = Math.max(10, (int)(var2 * 246.0F) + 10);
++		}
++		this.saveOptions();
+ 	}
+ 
+ 	public void setOptionValue(int var1, int var2) {
+@@ -91,14 +95,10 @@
+ 		}
+ 
+ 		if(var1 == 7) {
 -			this.limitFramerate = !this.limitFramerate;
 -		}
 -
- 		if(var1 == 8) {
+-		if(var1 == 8) {
  			this.difficulty = this.difficulty + var2 & 3;
  		}
-@@ -115,7 +110,7 @@
+ 
+-		if(var1 == 9) {
++		if(var1 == 8) {
+ 			this.fancyGraphics = !this.fancyGraphics;
+ 			this.mc.renderGlobal.loadRenderers();
+ 		}
+@@ -107,15 +107,25 @@
+ 	}
+ 
+ 	public int isSlider(int var1) {
+-		return var1 == 0 ? 1 : (var1 == 1 ? 1 : (var1 == 3 ? 1 : 0));
++		return var1 == 0 ? 1 : (var1 == 1 ? 1 : (var1 == 3 ? 1 : (var1 == 9 ? 1 : 0)));
+ 	}
+ 
+ 	public float getOptionFloatValue(int var1) {
+-		return var1 == 0 ? this.musicVolume : (var1 == 1 ? this.soundVolume : (var1 == 3 ? this.mouseSensitivity : 0.0F));
++		return var1 == 0 ? this.musicVolume : (var1 == 1 ? this.soundVolume : (var1 == 3 ? this.mouseSensitivity : (var1 == 9 ? (Math.max(10, this.fpsLimit) - 10) / 246.0F : 0.0F)));
  	}
  
  	public String getOptionDisplayString(int var1) {
 -		return var1 == 0 ? "Music: " + (this.musicVolume > 0.0F ? (int)(this.musicVolume * 100.0F) + "%" : "OFF") : (var1 == 1 ? "Sound: " + (this.soundVolume > 0.0F ? (int)(this.soundVolume * 100.0F) + "%" : "OFF") : (var1 == 2 ? "Invert mouse: " + (this.invertMouse ? "ON" : "OFF") : (var1 == 3 ? (this.mouseSensitivity == 0.0F ? "Sensitivity: *yawn*" : (this.mouseSensitivity == 1.0F ? "Sensitivity: HYPERSPEED!!!" : "Sensitivity: " + (int)(this.mouseSensitivity * 200.0F) + "%")) : (var1 == 4 ? "Render distance: " + RENDER_DISTANCES[this.renderDistance] : (var1 == 5 ? "View bobbing: " + (this.viewBobbing ? "ON" : "OFF") : (var1 == 6 ? "3d anaglyph: " + (this.anaglyph ? "ON" : "OFF") : (var1 == 7 ? "Limit framerate: " + (this.limitFramerate ? "ON" : "OFF") : (var1 == 8 ? "Difficulty: " + DIFFICULTY_LEVELS[this.difficulty] : (var1 == 9 ? "Graphics: " + (this.fancyGraphics ? "FANCY" : "FAST") : "")))))))));
-+		return var1 == 0 ? "Music: " + (this.musicVolume > 0.0F ? (int)(this.musicVolume * 100.0F) + "%" : "OFF") : (var1 == 1 ? "Sound: " + (this.soundVolume > 0.0F ? (int)(this.soundVolume * 100.0F) + "%" : "OFF") : (var1 == 2 ? "Invert mouse: " + (this.invertMouse ? "ON" : "OFF") : (var1 == 3 ? (this.mouseSensitivity == 0.0F ? "Sensitivity: *yawn*" : (this.mouseSensitivity == 1.0F ? "Sensitivity: HYPERSPEED!!!" : "Sensitivity: " + (int)(this.mouseSensitivity * 200.0F) + "%")) : (var1 == 4 ? "Render distance: " + RENDER_DISTANCES[this.renderDistance] : (var1 == 5 ? "View bobbing: " + (this.viewBobbing ? "ON" : "OFF") : (var1 == 6 ? "3d anaglyph: " + (this.anaglyph ? "ON" : "OFF") : (var1 == 7 ? "Difficulty: " + DIFFICULTY_LEVELS[this.difficulty] : (var1 == 8 ? "Graphics: " + (this.fancyGraphics ? "FANCY" : "FAST") : ""))))))));
++		return var1 == 0 ? "Music: " + (this.musicVolume > 0.0F ? (int)(this.musicVolume * 100.0F) + "%" : "OFF")
++			: (var1 == 1 ? "Sound: " + (this.soundVolume > 0.0F ? (int)(this.soundVolume * 100.0F) + "%" : "OFF")
++			: (var1 == 2 ? "Invert mouse: " + (this.invertMouse ? "ON" : "OFF")
++			: (var1 == 3 ? (this.mouseSensitivity == 0.0F ? "Sensitivity: *yawn*" : (this.mouseSensitivity == 1.0F ? "Sensitivity: HYPERSPEED!!!" : "Sensitivity: " + (int)(this.mouseSensitivity * 200.0F) + "%"))
++			: (var1 == 4 ? "Render distance: " + RENDER_DISTANCES[this.renderDistance]
++			: (var1 == 5 ? "View bobbing: " + (this.viewBobbing ? "ON" : "OFF")
++			: (var1 == 6 ? "3d anaglyph: " + (this.anaglyph ? "ON" : "OFF")
++			: (var1 == 7 ? "Difficulty: " + DIFFICULTY_LEVELS[this.difficulty]
++			: (var1 == 8 ? "Graphics: " + (this.fancyGraphics ? "FANCY" : "FAST")
++			: (var1 == 9 ? "FPS Limit: " + (this.fpsLimit >= 256 ? "Unlimited" : this.fpsLimit)
++			: "")))))))));
  	}
  
  	public void loadOptions() {
-@@ -163,10 +158,6 @@
+@@ -163,10 +173,6 @@
  					this.anaglyph = var3[1].equals("true");
  				}
  
@@ -1037,14 +1091,28 @@
  				if(var3[0].equals("difficulty")) {
  					this.difficulty = Integer.parseInt(var3[1]);
  				}
-@@ -202,7 +193,6 @@
+@@ -175,6 +181,10 @@
+ 					this.fancyGraphics = var3[1].equals("true");
+ 				}
+ 
++				if(var3[0].equals("fpsLimit")) {
++					this.fpsLimit = Integer.parseInt(var3[1]);
++				}
++
+ 				for(int var4 = 0; var4 < this.keyBindings.length; ++var4) {
+ 					if(var3[0].equals("key_" + this.keyBindings[var4].keyDescription)) {
+ 						this.keyBindings[var4].keyCode = Integer.parseInt(var3[1]);
+@@ -202,9 +212,9 @@
  			var1.println("viewDistance:" + this.renderDistance);
  			var1.println("bobView:" + this.viewBobbing);
  			var1.println("anaglyph3d:" + this.anaglyph);
 -			var1.println("limitFramerate:" + this.limitFramerate);
  			var1.println("difficulty:" + this.difficulty);
  			var1.println("fancyGraphics:" + this.fancyGraphics);
++			var1.println("fpsLimit:" + this.fpsLimit);
  
+ 			for(int var2 = 0; var2 < this.keyBindings.length; ++var2) {
+ 				var1.println("key_" + this.keyBindings[var2].keyDescription + ":" + this.keyBindings[var2].keyCode);
 --- net/minecraft/src/BlockCactus.java
 +++ net/minecraft/src/BlockCactus.java
 @@ -81,6 +81,9 @@
