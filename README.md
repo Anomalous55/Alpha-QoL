@@ -42,7 +42,7 @@ This project aims to provide **minimal improvement**, focused strictly on small 
 - Pressure Plates, Bookshelves, and Stairs now properly drop themselves when broken.
 - Falling Snow in Winter Mode worlds now has a less obtrusive texture.
 - Made the UI a little bit snappier (by fixing a bug where player inputs were skipped).
-- Music now plays roughly twice as often (Music is still semi-random with intervals of about 10-15 minutes instead of 20-25 minutes).
+- Music now plays more often (Music is still semi-random with intervals of about 10-15 minutes instead of 20-25 minutes).
 - Fixed a bug where pressing a movement key and the Inventory key at the same time would cause you to move until the 'ESC' key is pressed.
 - Fixed a bug where liquids would be placed when interacting with a block.
 - Fixed a bug where instantly breakable blocks would be broken open returning to game from pause menu.
