@@ -4273,7 +4273,7 @@
  		}
 --- net/minecraft/src/GuiContainer.java
 +++ net/minecraft/src/GuiContainer.java
-@@ -4,224 +4,620 @@
+@@ -4,224 +4,636 @@
  import java.util.List;
  import org.lwjgl.opengl.GL11;
  import org.lwjgl.opengl.GL12;
@@ -4511,7 +4511,7 @@
 +    private List dragSlots = new ArrayList();
 +    private List dragSlotOriginals = new ArrayList();
 +    private long lastClickTime = 0L;
-+    private Slot lastClickSlot = null;
++    private SlotInventory lastClickSlot = null;
 +
 +    public void drawScreen(int var1, int var2, float var3) {
 +        this.drawDefaultBackground();
@@ -4520,30 +4520,33 @@
 +        this.drawGuiContainerBackgroundLayer(var3);
 +
 +        if (this.isDragging && (Mouse.isButtonDown(0) || Mouse.isButtonDown(1))) {
-+            Slot varHover = this.getSlotAtPosition(var1, var2);
++            SlotInventory varHover = this.getSlotAtPosition(var1, var2);
 +            if (varHover != null && !this.dragSlots.contains(varHover)) {
 +                InventoryPlayer var5Inv = this.mc.thePlayer.inventory;
 +                boolean valid = false;
-+                ItemStack slotStack = varHover.getStack();
 +
-+                if (this.dragSourceItem != null) {
-+                    if (slotStack == null || (slotStack.itemID == this.dragSourceItem.itemID && slotStack.stackSize < slotStack.getMaxStackSize())) {
-+                        valid = true;
++                if (!this.isOutputSlot(this.inventorySlots.indexOf(varHover))) {
++                    ItemStack slotStack = varHover.getStack();
++
++                    if (this.dragSourceItem != null && varHover.isItemValid(this.dragSourceItem)) {
++                        if (slotStack == null || (slotStack.itemID == this.dragSourceItem.itemID && slotStack.stackSize < slotStack.getMaxStackSize())) {
++                            valid = true;
++                        }
 +                    }
-+                }
 +
-+                if (valid) {
-+                    if (this.dragMode == 2 && this.dragInitialAmount / (this.dragSlots.size() + 1) < 1) {
-+                        valid = false;
-+                    } else if (this.dragMode == 1 && (var5Inv.draggedItemStack == null || var5Inv.draggedItemStack.stackSize <= 0)) {
-+                        valid = false;
++                    if (valid) {
++                        if (this.dragMode == 2 && this.dragInitialAmount / (this.dragSlots.size() + 1) < 1) {
++                            valid = false;
++                        } else if (this.dragMode == 1 && (var5Inv.draggedItemStack == null || var5Inv.draggedItemStack.stackSize <= 0)) {
++                            valid = false;
++                        }
 +                    }
-+                }
 +
-+                if (valid) {
-+                    this.dragSlots.add(varHover);
-+                    this.dragSlotOriginals.add(new Integer(slotStack == null ? 0 : slotStack.stackSize));
-+                    this.updateDragState(var5Inv);
++                    if (valid) {
++                        this.dragSlots.add(varHover);
++                        this.dragSlotOriginals.add(new Integer(slotStack == null ? 0 : slotStack.stackSize));
++                        this.updateDragState(var5Inv);
++                    }
 +                }
 +            }
 +        } else if (this.isDragging && !Mouse.isButtonDown(0) && !Mouse.isButtonDown(1)) {
@@ -4617,7 +4620,7 @@
 +        itemRenderer.renderItemOverlayIntoGUI(this.fontRenderer, this.mc.renderEngine, var6, var4, var5);
 +    }
 +
-+    private Slot getSlotAtPosition(int var1, int var2) {
++    private SlotInventory getSlotAtPosition(int var1, int var2) {
 +        for(int var3 = 0; var3 < this.inventorySlots.size(); ++var3) {
 +            SlotInventory var4 = (SlotInventory)this.inventorySlots.get(var3);
 +            if(var4.getIsMouseOverSlot(var1, var2)) {
@@ -4629,20 +4632,18 @@
 +
 +    protected void mouseClicked(int var1, int var2, int var3) {
 +        if(var3 == 0 || var3 == 1) {
-+            Slot var4 = this.getSlotAtPosition(var1, var2);
++            SlotInventory var4 = this.getSlotAtPosition(var1, var2);
 +            InventoryPlayer var5 = this.mc.thePlayer.inventory;
 +            boolean shiftDown = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT);
 +            boolean ctrlDown = Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL);
 +
 +            long time = System.currentTimeMillis();
-+            boolean isDoubleClick = (var4 != null && var4 == this.lastClickSlot && time - this.lastClickTime < 250L);
 +            this.lastClickTime = time;
 +            this.lastClickSlot = var4;
 +
-+            if (isDoubleClick && var5.draggedItemStack != null) {
-+                this.gatherItems(var5.draggedItemStack, var4);
-+                return;
-+            }
++            boolean isOutput = var4 != null && this.isOutputSlot(this.inventorySlots.indexOf(var4));
++
++            // REMOVED: The block that triggers gatherItems() on a double-click has been entirely removed here.
 +
 +            if (var5.draggedItemStack != null) {
 +                if (ctrlDown || var3 == 1) {
@@ -4653,12 +4654,14 @@
 +                    this.dragSlotOriginals.clear();
 +                    this.dragMode = ctrlDown ? 2 : 1;
 +
-+                    if (var4 != null) {
-+                        ItemStack slotStack = var4.getStack();
-+                        if (slotStack == null || (slotStack.itemID == var5.draggedItemStack.itemID && slotStack.stackSize < slotStack.getMaxStackSize())) {
-+                            this.dragSlots.add(var4);
-+                            this.dragSlotOriginals.add(new Integer(slotStack == null ? 0 : slotStack.stackSize));
-+                            this.updateDragState(var5);
++                    if (var4 != null && !this.isOutputSlot(this.inventorySlots.indexOf(var4))) {
++                        if (var4.isItemValid(this.dragSourceItem)) {
++                            ItemStack slotStack = var4.getStack();
++                            if (slotStack == null || (slotStack.itemID == var5.draggedItemStack.itemID && slotStack.stackSize < slotStack.getMaxStackSize())) {
++                                this.dragSlots.add(var4);
++                                this.dragSlotOriginals.add(new Integer(slotStack == null ? 0 : slotStack.stackSize));
++                                this.updateDragState(var5);
++                            }
 +                        }
 +                    }
 +                    return;
@@ -4667,7 +4670,7 @@
 +
 +            if (var4 != null && shiftDown && var5.draggedItemStack == null) {
 +                if (var4.getStack() != null) {
-+                    this.handleShiftClick((SlotInventory)var4);
++                    this.handleShiftClick(var4);
 +                }
 +                return;
 +            }
@@ -4856,10 +4859,13 @@
 +        }
 +    }
 +
-+    private void gatherItems(ItemStack cursorStack, Slot clickedSlot) {
++    // gatherItems() method structure left here to prevent any class structure compiler breaking,
++    // but it is no longer called anywhere.
++    private void gatherItems(ItemStack cursorStack, SlotInventory clickedSlot) {
 +        if (cursorStack == null) return;
 +        int max = cursorStack.getMaxStackSize();
 +        for (int i = 0; i < this.inventorySlots.size(); i++) {
++            if (this.isOutputSlot(i)) continue;
 +            SlotInventory slot = (SlotInventory)this.inventorySlots.get(i);
 +            if (slot == clickedSlot) continue;
 +            ItemStack slotStack = slot.getStack();
@@ -4875,6 +4881,7 @@
 +            }
 +        }
 +        for (int i = 0; i < this.inventorySlots.size(); i++) {
++            if (this.isOutputSlot(i)) continue;
 +            SlotInventory slot = (SlotInventory)this.inventorySlots.get(i);
 +            if (slot == clickedSlot) continue;
 +            ItemStack slotStack = slot.getStack();
@@ -5110,6 +5117,15 @@
 +
 +        int id = stack.itemID;
 +        return id == 15 || id == 14 || id == 12 || id == 4 || id == 337 || id == 319 || id == 349 || id == 81;
++    }
++
++    private boolean isOutputSlot(int index) {
++        if (this instanceof GuiCrafting || this instanceof GuiInventory) {
++            return index == 0;
++        } else if (this instanceof GuiFurnace) {
++            return index == 2;
++        }
++        return false;
 +    }
  }
 --- net/minecraft/src/BlockChest.java
@@ -5859,7 +5875,7 @@
  }
 --- net/minecraft/src/ModelBiped.java
 +++ net/minecraft/src/ModelBiped.java
-@@ -1,141 +1,260 @@
+@@ -1,141 +1,258 @@
  package net.minecraft.src;
  
 +import org.lwjgl.opengl.GL11;
@@ -6059,12 +6075,10 @@
 +
 +        if (this.is64x64) {
 +            this.bipedLeftArm = new ModelRenderer(32, 48);
-+            this.bipedLeftArm.mirror = true;
 +            this.bipedLeftArm.addBox(-1.0F, -2.0F, -2.0F, 4, 12, 4, var1);
 +            this.bipedLeftArm.setRotationPoint(5.0F, 2.0F + var2, 0.0F);
 +
 +            this.bipedLeftLeg = new ModelRenderer(16, 48);
-+            this.bipedLeftLeg.mirror = true;
 +            this.bipedLeftLeg.addBox(-2.0F, 0.0F, -2.0F, 4, 12, 4, var1);
 +            this.bipedLeftLeg.setRotationPoint(2.0F, 12.0F + var2, 0.0F);
 +
