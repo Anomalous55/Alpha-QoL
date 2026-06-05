@@ -68,6 +68,315 @@
  	protected String getLivingSound() {
  		return "mob.pig";
  	}
+--- net/minecraft/src/RenderPlayer.java
++++ net/minecraft/src/RenderPlayer.java
+@@ -3,146 +3,164 @@
+ import org.lwjgl.opengl.GL11;
+ 
+ public class RenderPlayer extends RenderLiving {
+-	private ModelBiped modelBipedMain = (ModelBiped)this.mainModel;
+-	private ModelBiped modelArmorChestplate = new ModelBiped(1.0F);
+-	private ModelBiped modelArmor = new ModelBiped(0.5F);
+-	private static final String[] armorFilenamePrefix = new String[]{"cloth", "chain", "iron", "diamond", "gold"};
+-
+-	public RenderPlayer() {
+-		super(new ModelBiped(0.0F), 0.5F);
+-	}
+-
+-	protected boolean setArmorModel(EntityPlayer var1, int var2) {
+-		ItemStack var3 = var1.inventory.armorItemInSlot(3 - var2);
+-		if(var3 != null) {
+-			Item var4 = var3.getItem();
+-			if(var4 instanceof ItemArmor) {
+-				ItemArmor var5 = (ItemArmor)var4;
+-				this.loadTexture("/armor/" + armorFilenamePrefix[var5.renderIndex] + "_" + (var2 == 2 ? 2 : 1) + ".png");
+-				ModelBiped var6 = var2 == 2 ? this.modelArmor : this.modelArmorChestplate;
+-				var6.bipedHead.showModel = var2 == 0;
+-				var6.bipedHeadwear.showModel = var2 == 0;
+-				var6.bipedBody.showModel = var2 == 1 || var2 == 2;
+-				var6.bipedRightArm.showModel = var2 == 1;
+-				var6.bipedLeftArm.showModel = var2 == 1;
+-				var6.bipedRightLeg.showModel = var2 == 2 || var2 == 3;
+-				var6.bipedLeftLeg.showModel = var2 == 2 || var2 == 3;
+-				this.setRenderPassModel(var6);
+-				return true;
+-			}
+-		}
+-
+-		return false;
+-	}
+-
+-	public void renderPlayer(EntityPlayer var1, double var2, double var4, double var6, float var8, float var9) {
+-		ItemStack var10 = var1.inventory.getCurrentItem();
+-		this.modelArmorChestplate.heldItemRight = this.modelArmor.heldItemRight = this.modelBipedMain.heldItemRight = var10 != null;
+-		this.modelArmorChestplate.isSneak = this.modelArmor.isSneak = this.modelBipedMain.isSneak = var1.isSneaking();
+-		super.doRenderLiving(var1, var2, var4 - (double)var1.yOffset, var6, var8, var9);
+-		this.modelArmorChestplate.isSneak = this.modelArmor.isSneak = this.modelBipedMain.isSneak = false;
+-		this.modelArmorChestplate.heldItemRight = this.modelArmor.heldItemRight = this.modelBipedMain.heldItemRight = false;
+-		FontRenderer var11 = this.getFontRendererFromRenderManager();
+-		float var12 = 1.6F;
+-		float var13 = (float)(1.0D / 60.0D) * var12;
+-		GL11.glPushMatrix();
+-		GL11.glTranslatef((float)var2 + 0.0F, (float)var4 + 2.3F, (float)var6);
+-		GL11.glNormal3f(0.0F, 1.0F, 0.0F);
+-		GL11.glRotatef(-this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
+-		GL11.glRotatef(this.renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
+-		float var14 = var1.getDistanceToEntity(this.renderManager.player);
+-		var13 = (float)((double)var13 * (Math.sqrt((double)var14) / 2.0D));
+-		GL11.glScalef(-var13, -var13, var13);
+-		String var15 = var1.username;
+-		GL11.glDisable(GL11.GL_LIGHTING);
+-		GL11.glDepthMask(false);
+-		GL11.glDisable(GL11.GL_DEPTH_TEST);
+-		GL11.glEnable(GL11.GL_BLEND);
+-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+-		Tessellator var16 = Tessellator.instance;
+-		GL11.glDisable(GL11.GL_TEXTURE_2D);
+-		var16.startDrawingQuads();
+-		int var17 = var11.getStringWidth(var15) / 2;
+-		var16.setColorRGBA_F(0.0F, 0.0F, 0.0F, 0.25F);
+-		var16.addVertex((double)(-var17 - 1), -1.0D, 0.0D);
+-		var16.addVertex((double)(-var17 - 1), 8.0D, 0.0D);
+-		var16.addVertex((double)(var17 + 1), 8.0D, 0.0D);
+-		var16.addVertex((double)(var17 + 1), -1.0D, 0.0D);
+-		var16.draw();
+-		GL11.glEnable(GL11.GL_TEXTURE_2D);
+-		var11.drawString(var15, -var11.getStringWidth(var15) / 2, 0, 553648127);
+-		GL11.glEnable(GL11.GL_DEPTH_TEST);
+-		GL11.glDepthMask(true);
+-		var11.drawString(var15, -var11.getStringWidth(var15) / 2, 0, -1);
+-		GL11.glEnable(GL11.GL_LIGHTING);
+-		GL11.glDisable(GL11.GL_BLEND);
+-		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+-		GL11.glPopMatrix();
+-	}
+-
+-	protected void renderSpecials(EntityPlayer var1, float var2) {
+-		ItemStack var3 = var1.inventory.getCurrentItem();
+-		if(var3 != null) {
+-			GL11.glPushMatrix();
+-			this.modelBipedMain.bipedRightArm.renderWithRotation(1.0F / 16.0F);
+-			GL11.glTranslatef(-(1.0F / 16.0F), 7.0F / 16.0F, 1.0F / 16.0F);
+-			float var4;
+-			if(var3.itemID < 256 && RenderBlocks.renderItemIn3d(Block.blocksList[var3.itemID].getRenderType())) {
+-				var4 = 0.5F;
+-				GL11.glTranslatef(0.0F, 3.0F / 16.0F, -(5.0F / 16.0F));
+-				var4 *= 12.0F / 16.0F;
+-				GL11.glRotatef(20.0F, 1.0F, 0.0F, 0.0F);
+-				GL11.glRotatef(45.0F, 0.0F, 1.0F, 0.0F);
+-				GL11.glScalef(var4, -var4, var4);
+-			} else if(Item.itemsList[var3.itemID].isFull3D()) {
+-				var4 = 10.0F / 16.0F;
+-				GL11.glTranslatef(0.0F, 3.0F / 16.0F, 0.0F);
+-				GL11.glScalef(var4, -var4, var4);
+-				GL11.glRotatef(-100.0F, 1.0F, 0.0F, 0.0F);
+-				GL11.glRotatef(45.0F, 0.0F, 1.0F, 0.0F);
+-			} else {
+-				var4 = 6.0F / 16.0F;
+-				GL11.glTranslatef(0.25F, 3.0F / 16.0F, -(3.0F / 16.0F));
+-				GL11.glScalef(var4, var4, var4);
+-				GL11.glRotatef(60.0F, 0.0F, 0.0F, 1.0F);
+-				GL11.glRotatef(-90.0F, 1.0F, 0.0F, 0.0F);
+-				GL11.glRotatef(20.0F, 0.0F, 0.0F, 1.0F);
+-			}
+-
+-			this.renderManager.itemRenderer.renderItem(var3);
+-			GL11.glPopMatrix();
+-		}
+-
+-	}
+-
+-	protected void scalePlayer(EntityPlayer var1, float var2) {
+-		float var3 = 15.0F / 16.0F;
+-		GL11.glScalef(var3, var3, var3);
+-	}
+-
+-	public void drawFirstPersonHand() {
+-		this.modelBipedMain.swingProgress = 0.0F;
+-		this.modelBipedMain.setRotationAngles(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F / 16.0F);
+-		this.modelBipedMain.bipedRightArm.render(1.0F / 16.0F);
+-	}
+-
+-	protected void preRenderCallback(EntityLiving var1, float var2) {
+-		this.scalePlayer((EntityPlayer)var1, var2);
+-	}
+-
+-	protected boolean shouldRenderPass(EntityLiving var1, int var2) {
+-		return this.setArmorModel((EntityPlayer)var1, var2);
+-	}
+-
+-	protected void renderEquippedItems(EntityLiving var1, float var2) {
+-		this.renderSpecials((EntityPlayer)var1, var2);
+-	}
+-
+-	public void doRenderLiving(EntityLiving var1, double var2, double var4, double var6, float var8, float var9) {
+-		this.renderPlayer((EntityPlayer)var1, var2, var4, var6, var8, var9);
+-	}
+-
+-	public void doRender(Entity var1, double var2, double var4, double var6, float var8, float var9) {
+-		this.renderPlayer((EntityPlayer)var1, var2, var4, var6, var8, var9);
+-	}
++    private ModelBiped modelBipedMain = (ModelBiped)this.mainModel;
++    private ModelBiped modelArmorChestplate = new ModelBiped(1.0F);
++    private ModelBiped modelArmor = new ModelBiped(0.5F);
++    private static final String[] armorFilenamePrefix = new String[]{"cloth", "chain", "iron", "diamond", "gold"};
++
++    public RenderPlayer() {
++        // ACTIVATES THE 64x64 MODERN SKIN FIX FOR THE PLAYER
++        super(new ModelBiped(0.0F, 0.0F, true), 0.5F);
++    }
++
++    protected boolean setArmorModel(EntityPlayer var1, int var2) {
++        ItemStack var3 = var1.inventory.armorItemInSlot(3 - var2);
++        if(var3 != null) {
++            Item var4 = var3.getItem();
++            if(var4 instanceof ItemArmor) {
++                ItemArmor var5 = (ItemArmor)var4;
++                this.loadTexture("/armor/" + armorFilenamePrefix[var5.renderIndex] + "_" + (var2 == 2 ? 2 : 1) + ".png");
++                ModelBiped var6 = var2 == 2 ? this.modelArmor : this.modelArmorChestplate;
++                var6.bipedHead.showModel = var2 == 0;
++                var6.bipedHeadwear.showModel = var2 == 0;
++                var6.bipedBody.showModel = var2 == 1 || var2 == 2;
++                var6.bipedRightArm.showModel = var2 == 1;
++                var6.bipedLeftArm.showModel = var2 == 1;
++                var6.bipedRightLeg.showModel = var2 == 2 || var2 == 3;
++                var6.bipedLeftLeg.showModel = var2 == 2 || var2 == 3;
++                this.setRenderPassModel(var6);
++                return true;
++            }
++        }
++
++        return false;
++    }
++
++    public void renderPlayer(EntityPlayer var1, double var2, double var4, double var6, float var8, float var9) {
++        ItemStack var10 = var1.inventory.getCurrentItem();
++        this.modelArmorChestplate.heldItemRight = this.modelArmor.heldItemRight = this.modelBipedMain.heldItemRight = var10 != null;
++        this.modelArmorChestplate.isSneak = this.modelArmor.isSneak = this.modelBipedMain.isSneak = var1.isSneaking();
++        super.doRenderLiving(var1, var2, var4 - (double)var1.yOffset, var6, var8, var9);
++        this.modelArmorChestplate.isSneak = this.modelArmor.isSneak = this.modelBipedMain.isSneak = false;
++        this.modelArmorChestplate.heldItemRight = this.modelArmor.heldItemRight = this.modelBipedMain.heldItemRight = false;
++        FontRenderer var11 = this.getFontRendererFromRenderManager();
++        float var12 = 1.6F;
++        float var13 = (float)(1.0D / 60.0D) * var12;
++        GL11.glPushMatrix();
++        GL11.glTranslatef((float)var2 + 0.0F, (float)var4 + 2.3F, (float)var6);
++        GL11.glNormal3f(0.0F, 1.0F, 0.0F);
++        GL11.glRotatef(-this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
++        GL11.glRotatef(this.renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
++        float var14 = var1.getDistanceToEntity(this.renderManager.player);
++        var13 = (float)((double)var13 * (Math.sqrt((double)var14) / 2.0D));
++        GL11.glScalef(-var13, -var13, var13);
++        String var15 = var1.username;
++        GL11.glDisable(GL11.GL_LIGHTING);
++        GL11.glDepthMask(false);
++        GL11.glDisable(GL11.GL_DEPTH_TEST);
++        GL11.glEnable(GL11.GL_BLEND);
++        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
++        Tessellator var16 = Tessellator.instance;
++        GL11.glDisable(GL11.GL_TEXTURE_2D);
++        var16.startDrawingQuads();
++        int var17 = var11.getStringWidth(var15) / 2;
++        var16.setColorRGBA_F(0.0F, 0.0F, 0.0F, 0.25F);
++        var16.addVertex((double)(-var17 - 1), -1.0D, 0.0D);
++        var16.addVertex((double)(-var17 - 1), 8.0D, 0.0D);
++        var16.addVertex((double)(var17 + 1), 8.0D, 0.0D);
++        var16.addVertex((double)(var17 + 1), -1.0D, 0.0D);
++        var16.draw();
++        GL11.glEnable(GL11.GL_TEXTURE_2D);
++        var11.drawString(var15, -var11.getStringWidth(var15) / 2, 0, 553648127);
++        GL11.glEnable(GL11.GL_DEPTH_TEST);
++        GL11.glDepthMask(true);
++        var11.drawString(var15, -var11.getStringWidth(var15) / 2, 0, -1);
++        GL11.glEnable(GL11.GL_LIGHTING);
++        GL11.glDisable(GL11.GL_BLEND);
++        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
++        GL11.glPopMatrix();
++    }
++
++    protected void renderSpecials(EntityPlayer var1, float var2) {
++        ItemStack var3 = var1.inventory.getCurrentItem();
++        if(var3 != null) {
++            GL11.glPushMatrix();
++            this.modelBipedMain.bipedRightArm.renderWithRotation(1.0F / 16.0F);
++            GL11.glTranslatef(-(1.0F / 16.0F), 7.0F / 16.0F, 1.0F / 16.0F);
++            float var4;
++            if(var3.itemID < 256 && RenderBlocks.renderItemIn3d(Block.blocksList[var3.itemID].getRenderType())) {
++                var4 = 0.5F;
++                GL11.glTranslatef(0.0F, 3.0F / 16.0F, -(5.0F / 16.0F));
++                var4 *= 12.0F / 16.0F;
++                GL11.glRotatef(20.0F, 1.0F, 0.0F, 0.0F);
++                GL11.glRotatef(45.0F, 0.0F, 1.0F, 0.0F);
++                GL11.glScalef(var4, -var4, var4);
++            } else if(Item.itemsList[var3.itemID].isFull3D()) {
++                var4 = 10.0F / 16.0F;
++                GL11.glTranslatef(0.0F, 3.0F / 16.0F, 0.0F);
++                GL11.glScalef(var4, -var4, var4);
++                GL11.glRotatef(-100.0F, 1.0F, 0.0F, 0.0F);
++                GL11.glRotatef(45.0F, 0.0F, 1.0F, 0.0F);
++            } else {
++                var4 = 6.0F / 16.0F;
++                GL11.glTranslatef(0.25F, 3.0F / 16.0F, -(3.0F / 16.0F));
++                GL11.glScalef(var4, var4, var4);
++                GL11.glRotatef(60.0F, 0.0F, 0.0F, 1.0F);
++                GL11.glRotatef(-90.0F, 1.0F, 0.0F, 0.0F);
++                GL11.glRotatef(20.0F, 0.0F, 0.0F, 1.0F);
++            }
++
++            this.renderManager.itemRenderer.renderItem(var3);
++            GL11.glPopMatrix();
++        }
++
++    }
++
++    protected void scalePlayer(EntityPlayer var1, float var2) {
++        float var3 = 15.0F / 16.0F;
++        GL11.glScalef(var3, var3, var3);
++    }
++
++    public void drawFirstPersonHand() {
++        this.modelBipedMain.swingProgress = 0.0F;
++        this.modelBipedMain.setRotationAngles(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F / 16.0F);
++
++        // --- FIRST PERSON MATRIX FIX AND SLEEVE RENDERING ---
++        if (this.modelBipedMain.is64x64) {
++            GL11.glMatrixMode(GL11.GL_TEXTURE);
++            GL11.glPushMatrix();
++            GL11.glScalef(1.0F, 0.5F, 1.0F);
++            GL11.glMatrixMode(GL11.GL_MODELVIEW);
++        }
++
++        this.modelBipedMain.bipedRightArm.render(1.0F / 16.0F);
++
++        if (this.modelBipedMain.is64x64) {
++            this.modelBipedMain.bipedRightArmwear.render(1.0F / 16.0F);
++
++            GL11.glMatrixMode(GL11.GL_TEXTURE);
++            GL11.glPopMatrix();
++            GL11.glMatrixMode(GL11.GL_MODELVIEW);
++        }
++    }
++
++    protected void preRenderCallback(EntityLiving var1, float var2) {
++        this.scalePlayer((EntityPlayer)var1, var2);
++    }
++
++    protected boolean shouldRenderPass(EntityLiving var1, int var2) {
++        return this.setArmorModel((EntityPlayer)var1, var2);
++    }
++
++    protected void renderEquippedItems(EntityLiving var1, float var2) {
++        this.renderSpecials((EntityPlayer)var1, var2);
++    }
++
++    public void doRenderLiving(EntityLiving var1, double var2, double var4, double var6, float var8, float var9) {
++        this.renderPlayer((EntityPlayer)var1, var2, var4, var6, var8, var9);
++    }
++
++    public void doRender(Entity var1, double var2, double var4, double var6, float var8, float var9) {
++        this.renderPlayer((EntityPlayer)var1, var2, var4, var6, var8, var9);
++    }
+ }
 --- net/minecraft/src/GuiIngame.java
 +++ net/minecraft/src/GuiIngame.java
 @@ -59,24 +59,16 @@
@@ -121,10 +430,102 @@
  		}
 --- net/minecraft/src/GuiContainer.java
 +++ net/minecraft/src/GuiContainer.java
-@@ -94,110 +94,121 @@
- 	}
+@@ -4,224 +4,620 @@
+ import java.util.List;
+ import org.lwjgl.opengl.GL11;
+ import org.lwjgl.opengl.GL12;
++import org.lwjgl.input.Keyboard;
++import org.lwjgl.input.Mouse;
  
- 	protected void mouseClicked(int var1, int var2, int var3) {
+ public abstract class GuiContainer extends GuiScreen {
+-	private static RenderItem itemRenderer = new RenderItem();
+-	protected int xSize = 176;
+-	protected int ySize = 166;
+-	protected List inventorySlots = new ArrayList();
+-
+-	public void drawScreen(int var1, int var2, float var3) {
+-		this.drawDefaultBackground();
+-		int var4 = (this.width - this.xSize) / 2;
+-		int var5 = (this.height - this.ySize) / 2;
+-		this.drawGuiContainerBackgroundLayer(var3);
+-		GL11.glPushMatrix();
+-		GL11.glRotatef(180.0F, 1.0F, 0.0F, 0.0F);
+-		RenderHelper.enableStandardItemLighting();
+-		GL11.glPopMatrix();
+-		GL11.glPushMatrix();
+-		GL11.glTranslatef((float)var4, (float)var5, 0.0F);
+-		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+-		GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+-
+-		for(int var6 = 0; var6 < this.inventorySlots.size(); ++var6) {
+-			SlotInventory var7 = (SlotInventory)this.inventorySlots.get(var6);
+-			this.drawSlotInventory(var7);
+-			if(var7.getIsMouseOverSlot(var1, var2)) {
+-				GL11.glDisable(GL11.GL_LIGHTING);
+-				GL11.glDisable(GL11.GL_DEPTH_TEST);
+-				int var8 = var7.xDisplayPosition;
+-				int var9 = var7.yDisplayPosition;
+-				this.drawGradientRect(var8, var9, var8 + 16, var9 + 16, -2130706433, -2130706433);
+-				GL11.glEnable(GL11.GL_LIGHTING);
+-				GL11.glEnable(GL11.GL_DEPTH_TEST);
+-			}
+-		}
+-
+-		InventoryPlayer var10 = this.mc.thePlayer.inventory;
+-		if(var10.draggedItemStack != null) {
+-			GL11.glTranslatef(0.0F, 0.0F, 32.0F);
+-			itemRenderer.renderItemIntoGUI(this.fontRenderer, this.mc.renderEngine, var10.draggedItemStack, var1 - var4 - 8, var2 - var5 - 8);
+-			itemRenderer.renderItemOverlayIntoGUI(this.fontRenderer, this.mc.renderEngine, var10.draggedItemStack, var1 - var4 - 8, var2 - var5 - 8);
+-		}
+-
+-		GL11.glDisable(GL12.GL_RESCALE_NORMAL);
+-		RenderHelper.disableStandardItemLighting();
+-		GL11.glDisable(GL11.GL_LIGHTING);
+-		GL11.glDisable(GL11.GL_DEPTH_TEST);
+-		this.drawGuiContainerForegroundLayer();
+-		GL11.glEnable(GL11.GL_LIGHTING);
+-		GL11.glEnable(GL11.GL_DEPTH_TEST);
+-		GL11.glPopMatrix();
+-	}
+-
+-	protected void drawGuiContainerForegroundLayer() {
+-	}
+-
+-	protected abstract void drawGuiContainerBackgroundLayer(float var1);
+-
+-	private void drawSlotInventory(SlotInventory var1) {
+-		IInventory var2 = var1.inventory;
+-		int var3 = var1.slotIndex;
+-		int var4 = var1.xDisplayPosition;
+-		int var5 = var1.yDisplayPosition;
+-		ItemStack var6 = var2.getStackInSlot(var3);
+-		if(var6 == null) {
+-			int var7 = var1.getBackgroundIconIndex();
+-			if(var7 >= 0) {
+-				GL11.glDisable(GL11.GL_LIGHTING);
+-				this.mc.renderEngine.bindTexture(this.mc.renderEngine.getTexture("/gui/items.png"));
+-				this.drawTexturedModalRect(var4, var5, var7 % 16 * 16, var7 / 16 * 16, 16, 16);
+-				GL11.glEnable(GL11.GL_LIGHTING);
+-				return;
+-			}
+-		}
+-
+-		itemRenderer.renderItemIntoGUI(this.fontRenderer, this.mc.renderEngine, var6, var4, var5);
+-		itemRenderer.renderItemOverlayIntoGUI(this.fontRenderer, this.mc.renderEngine, var6, var4, var5);
+-	}
+-
+-	private Slot getSlotAtPosition(int var1, int var2) {
+-		for(int var3 = 0; var3 < this.inventorySlots.size(); ++var3) {
+-			SlotInventory var4 = (SlotInventory)this.inventorySlots.get(var3);
+-			if(var4.getIsMouseOverSlot(var1, var2)) {
+-				return var4;
+-			}
+-		}
+-
+-		return null;
+-	}
+-
+-	protected void mouseClicked(int var1, int var2, int var3) {
 -		if(var3 == 0 || var3 == 1) {
 -			Slot var4 = this.getSlotAtPosition(var1, var2);
 -			InventoryPlayer var5 = this.mc.thePlayer.inventory;
@@ -229,124 +630,645 @@
 -		}
 -
 -	}
-+	if(var3 == 0 || var3 == 1) {
-+		Slot var4 = this.getSlotAtPosition(var1, var2);
-+		InventoryPlayer var5 = this.mc.thePlayer.inventory;
-+        int var7;
-+        if(var4 != null) {
-+            ItemStack var6 = var4.getStack();
-+            if(var6 != null || var5.draggedItemStack != null) {
-+                if(var6 != null && var5.draggedItemStack == null) {
-+                    var7 = var3 == 0 ? var6.stackSize : (var6.stackSize + 1) / 2;
-+                    var5.draggedItemStack = var4.inventory.decrStackSize(var4.slotIndex, var7);
-+                    if(var6.stackSize == 0) {
-+                        var4.putStack((ItemStack)null);
+-
+-	protected void mouseMovedOrUp(int var1, int var2, int var3) {
+-		if(var3 == 0) {
+-		}
+-
+-	}
+-
+-	protected void keyTyped(char var1, int var2) {
+-		if(var2 == 1 || var2 == this.mc.options.keyBindInventory.keyCode) {
+-			this.mc.displayGuiScreen((GuiScreen)null);
+-		}
+-
+-	}
+-
+-	public void onGuiClosed() {
+-		InventoryPlayer var1 = this.mc.thePlayer.inventory;
+-		if(var1.draggedItemStack != null) {
+-			this.mc.thePlayer.dropPlayerItem(var1.draggedItemStack);
+-			var1.draggedItemStack = null;
+-		}
+-
+-	}
+-
+-	public boolean doesGuiPauseGame() {
+-		return false;
+-	}
++    private static RenderItem itemRenderer = new RenderItem();
++    protected int xSize = 176;
++    protected int ySize = 166;
++    protected List inventorySlots = new ArrayList();
++
++    private boolean isDragging = false;
++    private int dragMode = 0;
++    private int dragInitialAmount = 0;
++    private ItemStack dragSourceItem = null;
++    private List dragSlots = new ArrayList();
++    private List dragSlotOriginals = new ArrayList();
++    private long lastClickTime = 0L;
++    private Slot lastClickSlot = null;
++
++    public void drawScreen(int var1, int var2, float var3) {
++        this.drawDefaultBackground();
++        int var4 = (this.width - this.xSize) / 2;
++        int var5 = (this.height - this.ySize) / 2;
++        this.drawGuiContainerBackgroundLayer(var3);
++
++        if (this.isDragging && (Mouse.isButtonDown(0) || Mouse.isButtonDown(1))) {
++            Slot varHover = this.getSlotAtPosition(var1, var2);
++            if (varHover != null && !this.dragSlots.contains(varHover)) {
++                InventoryPlayer var5Inv = this.mc.thePlayer.inventory;
++                boolean valid = false;
++                ItemStack slotStack = varHover.getStack();
++
++                if (this.dragSourceItem != null) {
++                    if (slotStack == null || (slotStack.itemID == this.dragSourceItem.itemID && slotStack.stackSize < slotStack.getMaxStackSize())) {
++                        valid = true;
 +                    }
++                }
 +
-+                    var4.onPickupFromSlot();
-+                } else if(var6 == null && var5.draggedItemStack != null && var4.isItemValid(var5.draggedItemStack)) {
-+                    var7 = var3 == 0 ? var5.draggedItemStack.stackSize : 1;
-+                    if(var7 > var4.inventory.getInventoryStackLimit()) {
-+                        var7 = var4.inventory.getInventoryStackLimit();
++                if (valid) {
++                    if (this.dragMode == 2 && this.dragInitialAmount / (this.dragSlots.size() + 1) < 1) {
++                        valid = false;
++                    } else if (this.dragMode == 1 && (var5Inv.draggedItemStack == null || var5Inv.draggedItemStack.stackSize <= 0)) {
++                        valid = false;
 +                    }
++                }
 +
-+                    var4.putStack(var5.draggedItemStack.splitStack(var7));
-+                    if(var5.draggedItemStack.stackSize == 0) {
-+                        var5.draggedItemStack = null;
-+                    }
-+                } else if(var6 != null && var5.draggedItemStack != null) {
-+                    if(var4.isItemValid(var5.draggedItemStack)) {
-+                        if(var6.itemID != var5.draggedItemStack.itemID) {
-+                            if(var5.draggedItemStack.stackSize <= var4.inventory.getInventoryStackLimit()) {
-+                                var4.putStack(var5.draggedItemStack);
-+                                var5.draggedItemStack = var6;
-+                            }
-+                        } else if(var6.itemID == var5.draggedItemStack.itemID) {
-+                            if(var3 == 0) {
-+                                var7 = var5.draggedItemStack.stackSize;
-+                                if(var7 > var4.inventory.getInventoryStackLimit() - var6.stackSize) {
-+                                    var7 = var4.inventory.getInventoryStackLimit() - var6.stackSize;
-+                                }
++                if (valid) {
++                    this.dragSlots.add(varHover);
++                    this.dragSlotOriginals.add(new Integer(slotStack == null ? 0 : slotStack.stackSize));
++                    this.updateDragState(var5Inv);
++                }
++            }
++        } else if (this.isDragging && !Mouse.isButtonDown(0) && !Mouse.isButtonDown(1)) {
++            this.endDrag();
++        }
 +
-+                                if(var7 > var5.draggedItemStack.getMaxStackSize() - var6.stackSize) {
-+                                    var7 = var5.draggedItemStack.getMaxStackSize() - var6.stackSize;
-+                                }
++        GL11.glPushMatrix();
++        GL11.glRotatef(180.0F, 1.0F, 0.0F, 0.0F);
++        RenderHelper.enableStandardItemLighting();
++        GL11.glPopMatrix();
++        GL11.glPushMatrix();
++        GL11.glTranslatef((float)var4, (float)var5, 0.0F);
++        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
++        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
 +
-+                                if(var7 > 0) {
-+                                    var5.draggedItemStack.splitStack(var7);
-+                                    if(var5.draggedItemStack.stackSize == 0) {
-+                                        var5.draggedItemStack = null;
-+                                    }
-+                                    var6.stackSize += var7;
-+                                } else {
-+                                    if(var5.draggedItemStack.stackSize <= var4.inventory.getInventoryStackLimit()) {
-+                                        var4.putStack(var5.draggedItemStack);
-+                                        var5.draggedItemStack = var6;
-+                                    }
-+                                }
-+                            } else if(var3 == 1) {
-+                                var7 = 1;
-+                                if(var7 > var4.inventory.getInventoryStackLimit() - var6.stackSize) {
-+                                    var7 = var4.inventory.getInventoryStackLimit() - var6.stackSize;
-+                                }
++        for(int var6 = 0; var6 < this.inventorySlots.size(); ++var6) {
++            SlotInventory var7 = (SlotInventory)this.inventorySlots.get(var6);
++            this.drawSlotInventory(var7);
 +
-+                                if(var7 > var5.draggedItemStack.getMaxStackSize() - var6.stackSize) {
-+                                    var7 = var5.draggedItemStack.getMaxStackSize() - var6.stackSize;
-+                                }
++            if(var7.getIsMouseOverSlot(var1, var2)) {
++                GL11.glDisable(GL11.GL_LIGHTING);
++                GL11.glDisable(GL11.GL_DEPTH_TEST);
++                int var8 = var7.xDisplayPosition;
++                int var9 = var7.yDisplayPosition;
++                this.drawGradientRect(var8, var9, var8 + 16, var9 + 16, -2130706433, -2130706433);
++                GL11.glEnable(GL11.GL_LIGHTING);
++                GL11.glEnable(GL11.GL_DEPTH_TEST);
++            }
++        }
 +
-+                                if(var7 > 0) {
-+                                    var5.draggedItemStack.splitStack(var7);
-+                                    if(var5.draggedItemStack.stackSize == 0) {
-+                                        var5.draggedItemStack = null;
-+                                    }
-+                                    var6.stackSize += var7;
-+                                } else {
-+                                    if(var5.draggedItemStack.stackSize <= var4.inventory.getInventoryStackLimit()) {
-+                                        var4.putStack(var5.draggedItemStack);
-+                                        var5.draggedItemStack = var6;
-+                                    }
-+                                }
-+                            }
++        InventoryPlayer var10 = this.mc.thePlayer.inventory;
++        if(var10.draggedItemStack != null && var10.draggedItemStack.stackSize > 0) {
++            GL11.glTranslatef(0.0F, 0.0F, 32.0F);
++            itemRenderer.renderItemIntoGUI(this.fontRenderer, this.mc.renderEngine, var10.draggedItemStack, var1 - var4 - 8, var2 - var5 - 8);
++            itemRenderer.renderItemOverlayIntoGUI(this.fontRenderer, this.mc.renderEngine, var10.draggedItemStack, var1 - var4 - 8, var2 - var5 - 8);
++        }
++
++        GL11.glDisable(GL12.GL_RESCALE_NORMAL);
++        RenderHelper.disableStandardItemLighting();
++        GL11.glDisable(GL11.GL_LIGHTING);
++        GL11.glDisable(GL11.GL_DEPTH_TEST);
++        this.drawGuiContainerForegroundLayer();
++        GL11.glEnable(GL11.GL_LIGHTING);
++        GL11.glEnable(GL11.GL_DEPTH_TEST);
++        GL11.glPopMatrix();
++    }
++
++    protected void drawGuiContainerForegroundLayer() {
++    }
++
++    protected abstract void drawGuiContainerBackgroundLayer(float var1);
++
++    private void drawSlotInventory(SlotInventory var1) {
++        IInventory var2 = var1.inventory;
++        int var3 = var1.slotIndex;
++        int var4 = var1.xDisplayPosition;
++        int var5 = var1.yDisplayPosition;
++        ItemStack var6 = var2.getStackInSlot(var3);
++        if(var6 == null) {
++            int var7 = var1.getBackgroundIconIndex();
++            if(var7 >= 0) {
++                GL11.glDisable(GL11.GL_LIGHTING);
++                this.mc.renderEngine.bindTexture(this.mc.renderEngine.getTexture("/gui/items.png"));
++                this.drawTexturedModalRect(var4, var5, var7 % 16 * 16, var7 / 16 * 16, 16, 16);
++                GL11.glEnable(GL11.GL_LIGHTING);
++                return;
++            }
++        }
++
++        itemRenderer.renderItemIntoGUI(this.fontRenderer, this.mc.renderEngine, var6, var4, var5);
++        itemRenderer.renderItemOverlayIntoGUI(this.fontRenderer, this.mc.renderEngine, var6, var4, var5);
++    }
++
++    private Slot getSlotAtPosition(int var1, int var2) {
++        for(int var3 = 0; var3 < this.inventorySlots.size(); ++var3) {
++            SlotInventory var4 = (SlotInventory)this.inventorySlots.get(var3);
++            if(var4.getIsMouseOverSlot(var1, var2)) {
++                return var4;
++            }
++        }
++        return null;
++    }
++
++    protected void mouseClicked(int var1, int var2, int var3) {
++        if(var3 == 0 || var3 == 1) {
++            Slot var4 = this.getSlotAtPosition(var1, var2);
++            InventoryPlayer var5 = this.mc.thePlayer.inventory;
++            boolean shiftDown = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT);
++            boolean ctrlDown = Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL);
++
++            long time = System.currentTimeMillis();
++            boolean isDoubleClick = (var4 != null && var4 == this.lastClickSlot && time - this.lastClickTime < 250L);
++            this.lastClickTime = time;
++            this.lastClickSlot = var4;
++
++            if (isDoubleClick && var5.draggedItemStack != null) {
++                this.gatherItems(var5.draggedItemStack, var4);
++                return;
++            }
++
++            if (var5.draggedItemStack != null) {
++                if (ctrlDown || var3 == 1) {
++                    this.isDragging = true;
++                    this.dragInitialAmount = var5.draggedItemStack.stackSize;
++                    this.dragSourceItem = new ItemStack(var5.draggedItemStack.itemID, var5.draggedItemStack.stackSize);
++                    this.dragSlots.clear();
++                    this.dragSlotOriginals.clear();
++                    this.dragMode = ctrlDown ? 2 : 1;
++
++                    if (var4 != null) {
++                        ItemStack slotStack = var4.getStack();
++                        if (slotStack == null || (slotStack.itemID == var5.draggedItemStack.itemID && slotStack.stackSize < slotStack.getMaxStackSize())) {
++                            this.dragSlots.add(var4);
++                            this.dragSlotOriginals.add(new Integer(slotStack == null ? 0 : slotStack.stackSize));
++                            this.updateDragState(var5);
 +                        }
-+                    } else if(var6.itemID == var5.draggedItemStack.itemID && var5.draggedItemStack.getMaxStackSize() > 1) {
-+                        var7 = var6.stackSize;
-+                        if(var7 > 0 && var7 + var5.draggedItemStack.stackSize <= var5.draggedItemStack.getMaxStackSize()) {
-+                            var5.draggedItemStack.stackSize += var7;
-+                            var6.splitStack(var7);
-+                            if(var6.stackSize == 0) {
-+                                var4.putStack((ItemStack)null);
-+                            }
-+
-+                            var4.onPickupFromSlot();
-+                        }
 +                    }
++                    return;
 +                }
 +            }
 +
-+            var4.onSlotChanged();
-+        } else if(var5.draggedItemStack != null) {
-+            int var9 = (this.width - this.xSize) / 2;
-+            var7 = (this.height - this.ySize) / 2;
-+            if(var1 < var9 || var2 < var7 || var1 >= var9 + this.xSize || var2 >= var7 + this.xSize) {
-+                EntityPlayerSP var8 = this.mc.thePlayer;
-+                if(var3 == 0) {
-+                    var8.dropPlayerItem(var5.draggedItemStack);
-+                    var5.draggedItemStack = null;
++            if (var4 != null && shiftDown && var5.draggedItemStack == null) {
++                if (var4.getStack() != null) {
++                    this.handleShiftClick((SlotInventory)var4);
 +                }
++                return;
++            }
 +
-+                if(var3 == 1) {
-+                    var8.dropPlayerItem(var5.draggedItemStack.splitStack(1));
-+                    if(var5.draggedItemStack.stackSize == 0) {
++            int var7;
++            if(var4 != null) {
++                ItemStack var6 = var4.getStack();
++                if(var6 != null || var5.draggedItemStack != null) {
++                    if(var6 != null && var5.draggedItemStack == null) {
++                        var7 = var3 == 0 ? var6.stackSize : (var6.stackSize + 1) / 2;
++                        var5.draggedItemStack = var4.inventory.decrStackSize(var4.slotIndex, var7);
++                        if(var6.stackSize == 0) {
++                            var4.putStack((ItemStack)null);
++                        }
++                        var4.onPickupFromSlot();
++                    } else if(var6 == null && var5.draggedItemStack != null && var4.isItemValid(var5.draggedItemStack)) {
++                        var7 = var3 == 0 ? var5.draggedItemStack.stackSize : 1;
++                        if(var7 > var4.inventory.getInventoryStackLimit()) {
++                            var7 = var4.inventory.getInventoryStackLimit();
++                        }
++                        var4.putStack(var5.draggedItemStack.splitStack(var7));
++                        if(var5.draggedItemStack.stackSize == 0) {
++                            var5.draggedItemStack = null;
++                        }
++                    } else if(var6 != null && var5.draggedItemStack != null) {
++                        if(var4.isItemValid(var5.draggedItemStack)) {
++                            if(var6.itemID != var5.draggedItemStack.itemID) {
++                                if(var5.draggedItemStack.stackSize <= var4.inventory.getInventoryStackLimit()) {
++                                    var4.putStack(var5.draggedItemStack);
++                                    var5.draggedItemStack = var6;
++                                }
++                            } else if(var6.itemID == var5.draggedItemStack.itemID) {
++                                if(var3 == 0) {
++                                    var7 = var5.draggedItemStack.stackSize;
++                                    if(var7 > var4.inventory.getInventoryStackLimit() - var6.stackSize) {
++                                        var7 = var4.inventory.getInventoryStackLimit() - var6.stackSize;
++                                    }
++                                    if(var7 > var5.draggedItemStack.getMaxStackSize() - var6.stackSize) {
++                                        var7 = var5.draggedItemStack.getMaxStackSize() - var6.stackSize;
++                                    }
++                                    if(var7 > 0) {
++                                        var5.draggedItemStack.splitStack(var7);
++                                        if(var5.draggedItemStack.stackSize == 0) {
++                                            var5.draggedItemStack = null;
++                                        }
++                                        var6.stackSize += var7;
++                                    } else {
++                                        if(var5.draggedItemStack.stackSize <= var4.inventory.getInventoryStackLimit()) {
++                                            var4.putStack(var5.draggedItemStack);
++                                            var5.draggedItemStack = var6;
++                                        }
++                                    }
++                                } else if(var3 == 1) {
++                                    var7 = 1;
++                                    if(var7 > var4.inventory.getInventoryStackLimit() - var6.stackSize) {
++                                        var7 = var4.inventory.getInventoryStackLimit() - var6.stackSize;
++                                    }
++                                    if(var7 > var5.draggedItemStack.getMaxStackSize() - var6.stackSize) {
++                                        var7 = var5.draggedItemStack.getMaxStackSize() - var6.stackSize;
++                                    }
++                                    if(var7 > 0) {
++                                        var5.draggedItemStack.splitStack(var7);
++                                        if(var5.draggedItemStack.stackSize == 0) {
++                                            var5.draggedItemStack = null;
++                                        }
++                                        var6.stackSize += var7;
++                                    } else {
++                                        if(var5.draggedItemStack.stackSize <= var4.inventory.getInventoryStackLimit()) {
++                                            var4.putStack(var5.draggedItemStack);
++                                            var5.draggedItemStack = var6;
++                                        }
++                                    }
++                                }
++                            }
++                        } else if(var6.itemID == var5.draggedItemStack.itemID && var5.draggedItemStack.getMaxStackSize() > 1) {
++                            var7 = var6.stackSize;
++                            if(var7 > 0 && var7 + var5.draggedItemStack.stackSize <= var5.draggedItemStack.getMaxStackSize()) {
++                                var5.draggedItemStack.stackSize += var7;
++                                var6.splitStack(var7);
++                                if(var6.stackSize == 0) {
++                                    var4.putStack((ItemStack)null);
++                                }
++                                var4.onPickupFromSlot();
++                            }
++                        }
++                    }
++                }
++                var4.onSlotChanged();
++            } else if(var5.draggedItemStack != null) {
++                int var9 = (this.width - this.xSize) / 2;
++                var7 = (this.height - this.ySize) / 2;
++                if(var1 < var9 || var2 < var7 || var1 >= var9 + this.xSize || var2 >= var7 + this.ySize) {
++                    EntityPlayerSP var8 = this.mc.thePlayer;
++                    if(var3 == 0) {
++                        var8.dropPlayerItem(var5.draggedItemStack);
 +                        var5.draggedItemStack = null;
++                    }
++                    if(var3 == 1) {
++                        var8.dropPlayerItem(var5.draggedItemStack.splitStack(1));
++                        if(var5.draggedItemStack.stackSize == 0) {
++                            var5.draggedItemStack = null;
++                        }
 +                    }
 +                }
 +            }
 +        }
 +    }
-+}
- 
- 	protected void mouseMovedOrUp(int var1, int var2, int var3) {
- 		if(var3 == 0) {
++
++    protected void mouseMovedOrUp(int var1, int var2, int var3) {
++        if (this.isDragging && var3 != -1) {
++            this.endDrag();
++        }
++    }
++
++    private void endDrag() {
++        this.isDragging = false;
++        InventoryPlayer var5 = this.mc.thePlayer.inventory;
++        if (var5.draggedItemStack != null && var5.draggedItemStack.stackSize <= 0) {
++            var5.draggedItemStack = null;
++        }
++        this.dragSlots.clear();
++        this.dragSlotOriginals.clear();
++    }
++
++    private void updateDragState(InventoryPlayer inv) {
++        if (this.dragMode == 1) {
++            SlotInventory lastSlot = (SlotInventory)this.dragSlots.get(this.dragSlots.size() - 1);
++            int origSize = ((Integer)this.dragSlotOriginals.get(this.dragSlotOriginals.size() - 1)).intValue();
++
++            if (inv.draggedItemStack != null && inv.draggedItemStack.stackSize > 0) {
++                ItemStack slotStack = lastSlot.getStack();
++                int toAdd = 1;
++                int maxLimit = Math.min(inv.draggedItemStack.getMaxStackSize(), lastSlot.inventory.getInventoryStackLimit());
++
++                if (origSize + toAdd <= maxLimit) {
++                    if (slotStack == null) {
++                        ItemStack temp = new ItemStack(inv.draggedItemStack.itemID, 1);
++                        lastSlot.putStack(temp);
++                    } else {
++                        slotStack.stackSize++;
++                    }
++                    inv.draggedItemStack.stackSize--;
++                    if (inv.draggedItemStack.stackSize <= 0) {
++                        inv.draggedItemStack = null;
++                    }
++                    lastSlot.onSlotChanged();
++                }
++            }
++        } else if (this.dragMode == 2) {
++            int totalDrag = this.dragInitialAmount;
++            int numSlots = this.dragSlots.size();
++            int amountPerSlot = totalDrag / numSlots;
++
++            int actualUsed = 0;
++            for (int i = 0; i < this.dragSlots.size(); i++) {
++                SlotInventory slot = (SlotInventory)this.dragSlots.get(i);
++                int origSize = ((Integer)this.dragSlotOriginals.get(i)).intValue();
++
++                int toAdd = amountPerSlot;
++                int maxLimit = Math.min(this.dragSourceItem.getMaxStackSize(), slot.inventory.getInventoryStackLimit());
++                if (origSize + toAdd > maxLimit) {
++                    toAdd = maxLimit - origSize;
++                }
++
++                ItemStack current = slot.getStack();
++                if (current == null && toAdd > 0) {
++                    ItemStack temp = new ItemStack(this.dragSourceItem.itemID, toAdd);
++                    slot.putStack(temp);
++                } else if (current != null) {
++                    current.stackSize = origSize + toAdd;
++                    if (current.stackSize <= 0) slot.putStack((ItemStack)null);
++                }
++                slot.onSlotChanged();
++                actualUsed += toAdd;
++            }
++
++            if (inv.draggedItemStack == null && actualUsed < this.dragInitialAmount) {
++                inv.draggedItemStack = new ItemStack(this.dragSourceItem.itemID, 0);
++            }
++            if (inv.draggedItemStack != null) {
++                inv.draggedItemStack.stackSize = this.dragInitialAmount - actualUsed;
++                if (inv.draggedItemStack.stackSize <= 0) {
++                    inv.draggedItemStack = null;
++                }
++            }
++        }
++    }
++
++    private void gatherItems(ItemStack cursorStack, Slot clickedSlot) {
++        if (cursorStack == null) return;
++        int max = cursorStack.getMaxStackSize();
++        for (int i = 0; i < this.inventorySlots.size(); i++) {
++            SlotInventory slot = (SlotInventory)this.inventorySlots.get(i);
++            if (slot == clickedSlot) continue;
++            ItemStack slotStack = slot.getStack();
++            if (slotStack != null && slotStack.itemID == cursorStack.itemID && slotStack.stackSize < max) {
++                int space = max - cursorStack.stackSize;
++                if (space <= 0) return;
++                int toTake = Math.min(space, slotStack.stackSize);
++                cursorStack.stackSize += toTake;
++                slot.inventory.decrStackSize(slot.slotIndex, toTake);
++                if (slot.getStack() != null && slot.getStack().stackSize <= 0) {
++                    slot.putStack((ItemStack)null);
++                }
++            }
++        }
++        for (int i = 0; i < this.inventorySlots.size(); i++) {
++            SlotInventory slot = (SlotInventory)this.inventorySlots.get(i);
++            if (slot == clickedSlot) continue;
++            ItemStack slotStack = slot.getStack();
++            if (slotStack != null && slotStack.itemID == cursorStack.itemID) {
++                int space = max - cursorStack.stackSize;
++                if (space <= 0) return;
++                int toTake = Math.min(space, slotStack.stackSize);
++                cursorStack.stackSize += toTake;
++                slot.inventory.decrStackSize(slot.slotIndex, toTake);
++                if (slot.getStack() != null && slot.getStack().stackSize <= 0) {
++                    slot.putStack((ItemStack)null);
++                }
++            }
++        }
++    }
++
++    protected void keyTyped(char var1, int var2) {
++        if(var2 == 1 || var2 == this.mc.options.keyBindInventory.keyCode) {
++            this.mc.displayGuiScreen((GuiScreen)null);
++        }
++    }
++
++    public void onGuiClosed() {
++        InventoryPlayer var1 = this.mc.thePlayer.inventory;
++        if(var1.draggedItemStack != null) {
++            if (var1.draggedItemStack.stackSize > 0) {
++                this.mc.thePlayer.dropPlayerItem(var1.draggedItemStack);
++            }
++            var1.draggedItemStack = null;
++        }
++    }
++
++    public boolean doesGuiPauseGame() {
++        return false;
++    }
++
++    private void handleShiftClick(SlotInventory clickedSlot) {
++        ItemStack stack = clickedSlot.getStack();
++        if (stack == null) return;
++
++        int absoluteIndex = this.inventorySlots.indexOf(clickedSlot);
++        int totalSlots = this.inventorySlots.size();
++        boolean success = false;
++
++        if (this instanceof GuiFurnace) {
++            if (absoluteIndex < 3) {
++                success = this.mergeItemStack(stack, totalSlots - 9, totalSlots, false);
++                if (!success) {
++                    success = this.mergeItemStack(stack, 3, totalSlots - 9, false);
++                }
++            } else {
++                boolean isFuelItem = this.isFuel(stack);
++                boolean isSmeltableItem = this.isSmeltable(stack);
++
++                if (isFuelItem && !isSmeltableItem) {
++                    success = this.mergeItemStack(stack, 1, 2, false);
++                } else if (!isFuelItem && isSmeltableItem) {
++                    success = this.mergeItemStack(stack, 0, 1, false);
++                } else if (isFuelItem && isSmeltableItem) {
++                    success = this.mergeItemStack(stack, 0, 1, false);
++                    if (!success) success = this.mergeItemStack(stack, 1, 2, false);
++                } else {
++                    success = this.mergeItemStack(stack, 0, 2, false);
++                }
++            }
++        }
++        else if (this instanceof GuiCrafting) {
++            if (absoluteIndex == 0) {
++                this.craftMax(clickedSlot, 10, totalSlots);
++                success = true;
++            } else if (absoluteIndex < 10) {
++                success = this.mergeItemStack(stack, totalSlots - 9, totalSlots, false);
++                if (!success) {
++                    success = this.mergeItemStack(stack, 10, totalSlots - 9, false);
++                }
++            } else {
++                success = this.moveBetweenPlayerSlots(clickedSlot, stack, absoluteIndex, 10, totalSlots);
++            }
++        }
++        else if (this instanceof GuiInventory) {
++            if (absoluteIndex == 0) {
++                this.craftMax(clickedSlot, 9, 45);
++                success = true;
++            } else if (absoluteIndex >= 1 && absoluteIndex <= 8) {
++                success = this.mergeItemStack(stack, 36, 45, false);
++                if (!success) {
++                    success = this.mergeItemStack(stack, 9, 36, false);
++                }
++            } else {
++                if (stack.getItem() instanceof ItemArmor) {
++                    int armorType = ((ItemArmor)stack.getItem()).armorType;
++                    int targetSlot = 5 + armorType;
++                    success = this.mergeItemStack(stack, targetSlot, targetSlot + 1, false);
++                }
++                if (!success) {
++                    success = this.moveBetweenPlayerSlots(clickedSlot, stack, absoluteIndex, 9, 45);
++                }
++            }
++        }
++        else {
++            int containerSlots = totalSlots - 36;
++            if (absoluteIndex < containerSlots) {
++                success = this.mergeItemStack(stack, totalSlots - 9, totalSlots, false);
++                if (!success) {
++                    success = this.mergeItemStack(stack, containerSlots, totalSlots - 9, false);
++                }
++            } else {
++                success = this.mergeItemStack(stack, 0, containerSlots, false);
++            }
++        }
++
++        if (success) {
++            if (stack.stackSize <= 0) {
++                clickedSlot.putStack((ItemStack)null);
++            } else {
++                clickedSlot.onSlotChanged();
++            }
++        }
++    }
++
++    private boolean moveBetweenPlayerSlots(SlotInventory clickedSlot, ItemStack stack, int absoluteIndex, int start, int end) {
++        int hotbarStart = end - 9;
++        if (absoluteIndex < hotbarStart) {
++            return this.mergeItemStack(stack, hotbarStart, end, false);
++        } else {
++            return this.mergeItemStack(stack, start, hotbarStart, false);
++        }
++    }
++
++    private void craftMax(SlotInventory resultSlot, int start, int end) {
++        ItemStack result = resultSlot.getStack();
++        if (result == null) return;
++
++        while (result != null && result.stackSize > 0) {
++            ItemStack copy = new ItemStack(result.itemID, result.stackSize);
++            if (this.mergeItemStack(copy, end - 9, end, false) || this.mergeItemStack(copy, start, end - 9, false)) {
++                resultSlot.onPickupFromSlot();
++                result = resultSlot.getStack();
++            } else {
++                break;
++            }
++        }
++    }
++
++    protected boolean mergeItemStack(ItemStack stack, int startIndex, int endIndex, boolean reverse) {
++        boolean success = false;
++        int i = reverse ? endIndex - 1 : startIndex;
++        SlotInventory slot;
++        ItemStack slotStack;
++
++        if (stack.getMaxStackSize() > 1) {
++            while (stack.stackSize > 0 && (!reverse && i < endIndex || reverse && i >= startIndex)) {
++                slot = (SlotInventory)this.inventorySlots.get(i);
++                slotStack = slot.getStack();
++
++                if (slotStack != null && slotStack.itemID == stack.itemID) {
++                    int combined = slotStack.stackSize + stack.stackSize;
++                    int maxLimit = Math.min(stack.getMaxStackSize(), slot.inventory.getInventoryStackLimit());
++
++                    if (combined <= maxLimit) {
++                        stack.stackSize = 0;
++                        slotStack.stackSize = combined;
++                        slot.onSlotChanged();
++                        success = true;
++                    } else if (slotStack.stackSize < maxLimit) {
++                        stack.stackSize -= maxLimit - slotStack.stackSize;
++                        slotStack.stackSize = maxLimit;
++                        slot.onSlotChanged();
++                        success = true;
++                    }
++                }
++                i += reverse ? -1 : 1;
++            }
++        }
++
++        if (stack.stackSize > 0) {
++            i = reverse ? endIndex - 1 : startIndex;
++            while (!reverse && i < endIndex || reverse && i >= startIndex) {
++                slot = (SlotInventory)this.inventorySlots.get(i);
++                slotStack = slot.getStack();
++
++                if (slotStack == null && slot.isItemValid(stack)) {
++                    ItemStack temp = new ItemStack(stack.itemID, stack.stackSize);
++                    slot.putStack(temp);
++                    slot.onSlotChanged();
++                    stack.stackSize = 0;
++                    success = true;
++                    break;
++                }
++                i += reverse ? -1 : 1;
++            }
++        }
++        return success;
++    }
++
++    private boolean isFuel(ItemStack stack) {
++        if (stack == null) return false;
++        try {
++            TileEntityFurnace dummy = new TileEntityFurnace();
++            java.lang.reflect.Method m = TileEntityFurnace.class.getDeclaredMethod("getItemBurnTime", ItemStack.class);
++            m.setAccessible(true);
++            return ((Integer) m.invoke(dummy, stack)) > 0;
++        } catch (Exception e) {
++            try {
++                java.lang.reflect.Method m = TileEntityFurnace.class.getDeclaredMethod("getItemBurnTime", ItemStack.class);
++                m.setAccessible(true);
++                return ((Integer) m.invoke(null, stack)) > 0;
++            } catch (Exception e2) {
++                int id = stack.itemID;
++                return id == 263 || id == 280 || id == 17 || id == 5 || id == 6 || id == 58 || id == 54 || id == 47 || id == 84 || id == 85 || id == 53 || id == 327;
++            }
++        }
++    }
++
++    private boolean isSmeltable(ItemStack stack) {
++        if (stack == null) return false;
++        try {
++            Class<?> recipeClass = null;
++            try { recipeClass = Class.forName("net.minecraft.src.RecipesFurnace"); }
++            catch (ClassNotFoundException e) { recipeClass = Class.forName("net.minecraft.src.FurnaceRecipes"); }
++
++            if (recipeClass != null) {
++                Object instance;
++                try {
++                    instance = recipeClass.getMethod("smelting").invoke(null);
++                } catch (Exception e) {
++                    instance = recipeClass.getMethod("getInstance").invoke(null);
++                }
++                Object result = recipeClass.getMethod("getSmeltingResult", int.class).invoke(instance, stack.itemID);
++                return result != null;
++            }
++        } catch (Exception e) {}
++
++        int id = stack.itemID;
++        return id == 15 || id == 14 || id == 12 || id == 4 || id == 337 || id == 319 || id == 349 || id == 81;
++    }
+ }
 --- net/minecraft/src/BlockChest.java
 +++ net/minecraft/src/BlockChest.java
 @@ -23,48 +23,19 @@
@@ -587,6 +1509,92 @@
 +	}
 +
  }
+--- net/minecraft/src/ImageBufferDownload.java
++++ net/minecraft/src/ImageBufferDownload.java
+@@ -11,47 +11,42 @@
+ 	private int imageHeight;
+ 
+ 	public BufferedImage parseUserSkin(BufferedImage var1) {
+-		if(var1 == null) {
+-			return null;
+-		} else {
+-			this.imageWidth = 64;
+-			this.imageHeight = 32;
+-			BufferedImage var2 = new BufferedImage(this.imageWidth, this.imageHeight, 2);
+-			Graphics var3 = var2.getGraphics();
+-			var3.drawImage(var1, 0, 0, (ImageObserver)null);
+-			var3.dispose();
+-			this.imageData = ((DataBufferInt)var2.getRaster().getDataBuffer()).getData();
+-			this.setAreaOpaque(0, 0, 32, 16);
+-			this.setAreaTransparent(32, 0, 64, 32);
+-			this.setAreaOpaque(0, 16, 64, 32);
+-			boolean var4 = false;
+-
+-			int var5;
+-			int var6;
+-			int var7;
+-			for(var5 = 32; var5 < 64; ++var5) {
+-				for(var6 = 0; var6 < 16; ++var6) {
+-					var7 = this.imageData[var5 + var6 * 64];
+-					if((var7 >> 24 & 255) < 128) {
+-						var4 = true;
+-					}
+-				}
+-			}
+-
+-			if(!var4) {
+-				for(var5 = 32; var5 < 64; ++var5) {
+-					for(var6 = 0; var6 < 16; ++var6) {
+-						var7 = this.imageData[var5 + var6 * 64];
+-						if((var7 >> 24 & 255) < 128) {
+-							var4 = true;
+-						}
+-					}
+-				}
+-			}
+-
+-			return var2;
+-		}
+-	}
++        if(var1 == null) {
++            return null;
++        } else {
++            this.imageWidth = 64;
++            this.imageHeight = 64; // Expanded to modern 64x64 format
++            BufferedImage var2 = new BufferedImage(this.imageWidth, this.imageHeight, 2);
++            Graphics var3 = var2.getGraphics();
++            var3.drawImage(var1, 0, 0, (ImageObserver)null);
++
++            // If the skin is a legacy 64x32 skin, copy the right limbs to the left limbs
++            // so ModelBiped doesn't render invisible left arms/legs.
++            if (var1.getHeight() == 32) {
++                var3.drawImage(var1, 16, 48, 32, 64, 0, 16, 16, 32, null);  // Copy Right Leg -> Left Leg
++                var3.drawImage(var1, 32, 48, 48, 64, 40, 16, 56, 32, null); // Copy Right Arm -> Left Arm
++            }
++            var3.dispose();
++
++            this.imageData = ((DataBufferInt)var2.getRaster().getDataBuffer()).getData();
++
++            // --- Base Layer Opacity ---
++            this.setAreaOpaque(0, 0, 32, 16);   // Head
++            this.setAreaOpaque(0, 16, 64, 32);  // Torso, Right Arm, Right Leg
++            this.setAreaOpaque(16, 48, 32, 64); // Left Leg Base
++            this.setAreaOpaque(32, 48, 48, 64); // Left Arm Base
++
++            // --- Outer Layer Transparency ---
++            this.setAreaTransparent(32, 0, 64, 32);   // Hat Overlay
++            this.setAreaTransparent(0, 32, 16, 48);   // Right Leg Overlay (Pants)
++            this.setAreaTransparent(16, 32, 40, 48);  // Torso Overlay (Jacket)
++            this.setAreaTransparent(40, 32, 56, 48);  // Right Arm Overlay (Sleeve)
++            this.setAreaTransparent(0, 48, 16, 64);   // Left Leg Overlay (Pants)
++            this.setAreaTransparent(48, 48, 64, 64);  // Left Arm Overlay (Sleeve)
++
++            return var2;
++        }
++    }
+ 
+ 	private void setAreaTransparent(int var1, int var2, int var3, int var4) {
+ 		if(!this.hasTransparency(var1, var2, var3, var4)) {
 --- net/minecraft/client/Minecraft.java
 +++ net/minecraft/client/Minecraft.java
 @@ -349,12 +349,16 @@
@@ -606,17 +1614,18 @@
  				this.setIngameFocus();
  			}
  
-@@ -479,6 +483,9 @@
+@@ -479,6 +483,10 @@
  
  					Thread.yield();
  					Display.update();
 +					if(this.options.fpsLimit < 256) {
 +						Display.sync(this.options.fpsLimit);
 +					}
++
  					if(this.mcCanvas != null && !this.fullscreen && (this.mcCanvas.getWidth() != this.displayWidth || this.mcCanvas.getHeight() != this.displayHeight)) {
  						this.displayWidth = this.mcCanvas.getWidth();
  						this.displayHeight = this.mcCanvas.getHeight();
-@@ -493,10 +500,6 @@
+@@ -493,10 +501,6 @@
  						this.resize(this.displayWidth, this.displayHeight);
  					}
  
@@ -627,7 +1636,7 @@
  					this.checkGLError("Post render");
  					++var3;
  
-@@ -591,11 +594,11 @@
+@@ -591,11 +595,11 @@
  	}
  
  	public void setIngameNotInFocus() {
@@ -643,7 +1652,7 @@
  			this.inGameHasFocus = false;
  			this.mouseHelper.ungrabMouseCursor();
  		}
-@@ -657,8 +660,15 @@
+@@ -657,8 +661,15 @@
  				} else {
  					ItemStack var7 = this.thePlayer.inventory.getCurrentItem();
  					int var8 = var7 != null ? var7.stackSize : 0;
@@ -660,7 +1669,7 @@
  					}
  
  					if(var7 == null) {
-@@ -687,7 +697,6 @@
+@@ -687,7 +698,6 @@
  					}
  				}
  			}
@@ -668,7 +1677,7 @@
  		}
  	}
  
-@@ -849,7 +858,15 @@
+@@ -849,7 +859,15 @@
  												break label234;
  											}
  
@@ -685,6 +1694,50 @@
  										} while(!Keyboard.getEventKeyState());
  
  										if(Keyboard.getEventKey() == Keyboard.KEY_F11) {
+@@ -1001,7 +1019,6 @@
+ 		if(this.theWorld != null) {
+ 			this.theWorld.saveWorldIndirectly(this.loadingScreen);
+ 		}
+-
+ 		this.theWorld = var1;
+ 		if(var1 != null) {
+ 			this.playerController.onWorldChange(var1);
+@@ -1014,26 +1031,22 @@
+ 					var1.spawnEntityInWorld(this.thePlayer);
+ 				}
+ 			}
+-
+ 			if(!var1.multiplayerWorld) {
+ 				this.preloadWorld(var2);
+ 			}
+-
+ 			if(this.thePlayer == null) {
+ 				this.thePlayer = (EntityPlayerSP)this.playerController.createPlayer(var1);
+ 				this.thePlayer.preparePlayerToSpawn();
+ 				this.playerController.flipPlayer(this.thePlayer);
+ 			}
+-
+ 			this.thePlayer.movementInput = new MovementInputFromOptions(this.options);
++			this.thePlayer.ySize = 0.0F; // FIX: prevent sneak phase bug on world reload
+ 			if(this.renderGlobal != null) {
+ 				this.renderGlobal.changeWorld(var1);
+ 			}
+-
+ 			if(this.effectRenderer != null) {
+ 				this.effectRenderer.clearEffects(var1);
+ 			}
+-
+ 			this.playerController.onRespawn(this.thePlayer);
+ 			var1.spawnPlayerWithLoadedChunks(this.thePlayer);
+ 			if(var1.isNewWorld) {
+@@ -1042,7 +1055,6 @@
+ 		} else {
+ 			this.thePlayer = null;
+ 		}
+-
+ 		System.gc();
+ 		this.systemTime = 0L;
+ 	}
 --- net/minecraft/src/InventoryPlayer.java
 +++ net/minecraft/src/InventoryPlayer.java
 @@ -33,7 +33,6 @@
@@ -703,6 +1756,25 @@
  	}
  
  	public void dropAllItems() {
+--- net/minecraft/src/EntityPlayerSP.java
++++ net/minecraft/src/EntityPlayerSP.java
+@@ -10,7 +10,7 @@
+ 		super(var2);
+ 		this.mc = var1;
+ 		if(var3 != null && var3.username != null && var3.username.length() > 0) {
+-			this.skinUrl = "http://www.minecraft.net/skin/" + var3.username + ".png";
++			this.skinUrl = "https://minotar.net/skin/" + var3.username + ".png";
+ 			System.out.println("Loading texture " + this.skinUrl);
+ 		}
+ 
+@@ -29,7 +29,6 @@
+ 		if(this.movementInput.sneak && this.ySize < 0.2F) {
+ 			this.ySize = 0.2F;
+ 		}
+-
+ 		super.onLivingUpdate();
+ 	}
+ 
 --- net/minecraft/src/BlockPressurePlate.java
 +++ net/minecraft/src/BlockPressurePlate.java
 @@ -138,6 +138,20 @@
@@ -747,7 +1819,15 @@
  }
 --- net/minecraft/src/Entity.java
 +++ net/minecraft/src/Entity.java
-@@ -377,32 +377,37 @@
+@@ -93,6 +93,7 @@
+ 
+ 			this.motionX = this.motionY = this.motionZ = 0.0D;
+ 			this.rotationPitch = 0.0F;
++			this.ySize = 0.0F;
+ 		}
+ 	}
+ 
+@@ -377,32 +378,37 @@
  
  			var37 = this.posX - var7;
  			var23 = this.posZ - var9;
@@ -807,7 +1887,7 @@
  			var28 = MathHelper.floor_double(this.boundingBox.maxX);
  			int var41 = MathHelper.floor_double(this.boundingBox.maxY);
  			int var30 = MathHelper.floor_double(this.boundingBox.maxZ);
-@@ -436,7 +441,6 @@
+@@ -436,7 +442,6 @@
  				this.worldObj.playSoundAtEntity(this, "random.fizz", 0.7F, 1.6F + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.4F);
  				this.fire = -this.fireResistance;
  			}
@@ -916,6 +1996,406 @@
 +		return this;
 +	}
 +
+ }
+--- net/minecraft/src/ModelBiped.java
++++ net/minecraft/src/ModelBiped.java
+@@ -1,141 +1,260 @@
+ package net.minecraft.src;
+ 
++import org.lwjgl.opengl.GL11;
++
+ public class ModelBiped extends ModelBase {
+-	public ModelRenderer bipedHead;
+-	public ModelRenderer bipedHeadwear;
+-	public ModelRenderer bipedBody;
+-	public ModelRenderer bipedRightArm;
+-	public ModelRenderer bipedLeftArm;
+-	public ModelRenderer bipedRightLeg;
+-	public ModelRenderer bipedLeftLeg;
+-	public boolean heldItemLeft;
+-	public boolean heldItemRight;
+-	public boolean isSneak;
+-
+-	public ModelBiped() {
+-		this(0.0F);
+-	}
+-
+-	public ModelBiped(float var1) {
+-		this(var1, 0.0F);
+-	}
+-
+-	public ModelBiped(float var1, float var2) {
+-		this.heldItemLeft = false;
+-		this.heldItemRight = false;
+-		this.isSneak = false;
+-		this.bipedHead = new ModelRenderer(0, 0);
+-		this.bipedHead.addBox(-4.0F, -8.0F, -4.0F, 8, 8, 8, var1);
+-		this.bipedHead.setRotationPoint(0.0F, 0.0F + var2, 0.0F);
+-		this.bipedHeadwear = new ModelRenderer(32, 0);
+-		this.bipedHeadwear.addBox(-4.0F, -8.0F, -4.0F, 8, 8, 8, var1 + 0.5F);
+-		this.bipedHeadwear.setRotationPoint(0.0F, 0.0F + var2, 0.0F);
+-		this.bipedBody = new ModelRenderer(16, 16);
+-		this.bipedBody.addBox(-4.0F, 0.0F, -2.0F, 8, 12, 4, var1);
+-		this.bipedBody.setRotationPoint(0.0F, 0.0F + var2, 0.0F);
+-		this.bipedRightArm = new ModelRenderer(40, 16);
+-		this.bipedRightArm.addBox(-3.0F, -2.0F, -2.0F, 4, 12, 4, var1);
+-		this.bipedRightArm.setRotationPoint(-5.0F, 2.0F + var2, 0.0F);
+-		this.bipedLeftArm = new ModelRenderer(40, 16);
+-		this.bipedLeftArm.mirror = true;
+-		this.bipedLeftArm.addBox(-1.0F, -2.0F, -2.0F, 4, 12, 4, var1);
+-		this.bipedLeftArm.setRotationPoint(5.0F, 2.0F + var2, 0.0F);
+-		this.bipedRightLeg = new ModelRenderer(0, 16);
+-		this.bipedRightLeg.addBox(-2.0F, 0.0F, -2.0F, 4, 12, 4, var1);
+-		this.bipedRightLeg.setRotationPoint(-2.0F, 12.0F + var2, 0.0F);
+-		this.bipedLeftLeg = new ModelRenderer(0, 16);
+-		this.bipedLeftLeg.mirror = true;
+-		this.bipedLeftLeg.addBox(-2.0F, 0.0F, -2.0F, 4, 12, 4, var1);
+-		this.bipedLeftLeg.setRotationPoint(2.0F, 12.0F + var2, 0.0F);
+-	}
+-
+-	public void render(float var1, float var2, float var3, float var4, float var5, float var6) {
+-		this.setRotationAngles(var1, var2, var3, var4, var5, var6);
+-		this.bipedHead.render(var6);
+-		this.bipedBody.render(var6);
+-		this.bipedRightArm.render(var6);
+-		this.bipedLeftArm.render(var6);
+-		this.bipedRightLeg.render(var6);
+-		this.bipedLeftLeg.render(var6);
+-		this.bipedHeadwear.render(var6);
+-	}
+-
+-	public void setRotationAngles(float var1, float var2, float var3, float var4, float var5, float var6) {
+-		this.bipedHead.rotateAngleY = var4 / (180.0F / (float)Math.PI);
+-		this.bipedHead.rotateAngleX = var5 / (180.0F / (float)Math.PI);
+-		this.bipedHeadwear.rotateAngleY = this.bipedHead.rotateAngleY;
+-		this.bipedHeadwear.rotateAngleX = this.bipedHead.rotateAngleX;
+-		this.bipedRightArm.rotateAngleX = MathHelper.cos(var1 * 0.6662F + (float)Math.PI) * 2.0F * var2 * 0.5F;
+-		this.bipedLeftArm.rotateAngleX = MathHelper.cos(var1 * 0.6662F) * 2.0F * var2 * 0.5F;
+-		this.bipedRightArm.rotateAngleZ = 0.0F;
+-		this.bipedLeftArm.rotateAngleZ = 0.0F;
+-		this.bipedRightLeg.rotateAngleX = MathHelper.cos(var1 * 0.6662F) * 1.4F * var2;
+-		this.bipedLeftLeg.rotateAngleX = MathHelper.cos(var1 * 0.6662F + (float)Math.PI) * 1.4F * var2;
+-		this.bipedRightLeg.rotateAngleY = 0.0F;
+-		this.bipedLeftLeg.rotateAngleY = 0.0F;
+-		if(this.isRiding) {
+-			this.bipedRightArm.rotateAngleX += (float)Math.PI * -0.2F;
+-			this.bipedLeftArm.rotateAngleX += (float)Math.PI * -0.2F;
+-			this.bipedRightLeg.rotateAngleX = (float)Math.PI * -0.4F;
+-			this.bipedLeftLeg.rotateAngleX = (float)Math.PI * -0.4F;
+-			this.bipedRightLeg.rotateAngleY = (float)Math.PI * 0.1F;
+-			this.bipedLeftLeg.rotateAngleY = (float)Math.PI * -0.1F;
+-		}
+-
+-		if(this.heldItemLeft) {
+-			this.bipedLeftArm.rotateAngleX = this.bipedLeftArm.rotateAngleX * 0.5F - (float)Math.PI * 0.1F;
+-		}
+-
+-		if(this.heldItemRight) {
+-			this.bipedRightArm.rotateAngleX = this.bipedRightArm.rotateAngleX * 0.5F - (float)Math.PI * 0.1F;
+-		}
+-
+-		this.bipedRightArm.rotateAngleY = 0.0F;
+-		this.bipedLeftArm.rotateAngleY = 0.0F;
+-		if(this.swingProgress > -9990.0F) {
+-			float var7 = this.swingProgress;
+-			this.bipedBody.rotateAngleY = MathHelper.sin(MathHelper.sqrt_float(var7) * (float)Math.PI * 2.0F) * 0.2F;
+-			this.bipedRightArm.rotationPointZ = MathHelper.sin(this.bipedBody.rotateAngleY) * 5.0F;
+-			this.bipedRightArm.rotationPointX = -MathHelper.cos(this.bipedBody.rotateAngleY) * 5.0F;
+-			this.bipedLeftArm.rotationPointZ = -MathHelper.sin(this.bipedBody.rotateAngleY) * 5.0F;
+-			this.bipedLeftArm.rotationPointX = MathHelper.cos(this.bipedBody.rotateAngleY) * 5.0F;
+-			this.bipedRightArm.rotateAngleY += this.bipedBody.rotateAngleY;
+-			this.bipedLeftArm.rotateAngleY += this.bipedBody.rotateAngleY;
+-			this.bipedLeftArm.rotateAngleX += this.bipedBody.rotateAngleY;
+-			var7 = 1.0F - this.swingProgress;
+-			var7 *= var7;
+-			var7 *= var7;
+-			var7 = 1.0F - var7;
+-			float var8 = MathHelper.sin(var7 * (float)Math.PI);
+-			float var9 = MathHelper.sin(this.swingProgress * (float)Math.PI) * -(this.bipedHead.rotateAngleX - 0.7F) * (12.0F / 16.0F);
+-			this.bipedRightArm.rotateAngleX = (float)((double)this.bipedRightArm.rotateAngleX - ((double)var8 * 1.2D + (double)var9));
+-			this.bipedRightArm.rotateAngleY += this.bipedBody.rotateAngleY * 2.0F;
+-			this.bipedRightArm.rotateAngleZ = MathHelper.sin(this.swingProgress * (float)Math.PI) * -0.4F;
+-		}
+-
+-		if(this.isSneak) {
+-			this.bipedBody.rotateAngleX = 0.5F;
+-			this.bipedRightLeg.rotateAngleX -= 0.0F;
+-			this.bipedLeftLeg.rotateAngleX -= 0.0F;
+-			this.bipedRightArm.rotateAngleX += 0.4F;
+-			this.bipedLeftArm.rotateAngleX += 0.4F;
+-			this.bipedRightLeg.rotationPointZ = 4.0F;
+-			this.bipedLeftLeg.rotationPointZ = 4.0F;
+-			this.bipedRightLeg.rotationPointY = 9.0F;
+-			this.bipedLeftLeg.rotationPointY = 9.0F;
+-			this.bipedHead.rotationPointY = 1.0F;
+-		} else {
+-			this.bipedBody.rotateAngleX = 0.0F;
+-			this.bipedRightLeg.rotationPointZ = 0.0F;
+-			this.bipedLeftLeg.rotationPointZ = 0.0F;
+-			this.bipedRightLeg.rotationPointY = 12.0F;
+-			this.bipedLeftLeg.rotationPointY = 12.0F;
+-			this.bipedHead.rotationPointY = 0.0F;
+-		}
+-
+-		this.bipedRightArm.rotateAngleZ += MathHelper.cos(var3 * 0.09F) * 0.05F + 0.05F;
+-		this.bipedLeftArm.rotateAngleZ -= MathHelper.cos(var3 * 0.09F) * 0.05F + 0.05F;
+-		this.bipedRightArm.rotateAngleX += MathHelper.sin(var3 * 0.067F) * 0.05F;
+-		this.bipedLeftArm.rotateAngleX -= MathHelper.sin(var3 * 0.067F) * 0.05F;
+-	}
++    public ModelRenderer bipedHead;
++    public ModelRenderer bipedHeadwear;
++    public ModelRenderer bipedBody;
++    public ModelRenderer bipedRightArm;
++    public ModelRenderer bipedLeftArm;
++    public ModelRenderer bipedRightLeg;
++    public ModelRenderer bipedLeftLeg;
++    public ModelRenderer bipedLeftArmwear;
++    public ModelRenderer bipedRightArmwear;
++    public ModelRenderer bipedLeftLegwear;
++    public ModelRenderer bipedRightLegwear;
++    public ModelRenderer bipedBodyWear;
++    public boolean heldItemLeft;
++    public boolean heldItemRight;
++    public boolean isSneak;
++    public boolean is64x64;
++
++    public ModelBiped() {
++        this(0.0F, 0.0F, false);
++    }
++
++    public ModelBiped(float var1) {
++        this(var1, 0.0F, false);
++    }
++
++    public ModelBiped(float var1, float var2) {
++        this(var1, var2, false);
++    }
++
++    public ModelBiped(float var1, float var2, boolean var3) {
++        this.is64x64 = var3;
++        this.heldItemLeft = false;
++        this.heldItemRight = false;
++        this.isSneak = false;
++
++        this.bipedHead = new ModelRenderer(0, 0);
++        this.bipedHead.addBox(-4.0F, -8.0F, -4.0F, 8, 8, 8, var1);
++        this.bipedHead.setRotationPoint(0.0F, 0.0F + var2, 0.0F);
++
++        this.bipedHeadwear = new ModelRenderer(32, 0);
++        this.bipedHeadwear.addBox(-4.0F, -8.0F, -4.0F, 8, 8, 8, var1 + 0.5F);
++        this.bipedHeadwear.setRotationPoint(0.0F, 0.0F + var2, 0.0F);
++
++        this.bipedBody = new ModelRenderer(16, 16);
++        this.bipedBody.addBox(-4.0F, 0.0F, -2.0F, 8, 12, 4, var1);
++        this.bipedBody.setRotationPoint(0.0F, 0.0F + var2, 0.0F);
++
++        this.bipedRightArm = new ModelRenderer(40, 16);
++        this.bipedRightArm.addBox(-3.0F, -2.0F, -2.0F, 4, 12, 4, var1);
++        this.bipedRightArm.setRotationPoint(-5.0F, 2.0F + var2, 0.0F);
++
++        this.bipedRightLeg = new ModelRenderer(0, 16);
++        this.bipedRightLeg.addBox(-2.0F, 0.0F, -2.0F, 4, 12, 4, var1);
++        this.bipedRightLeg.setRotationPoint(-2.0F, 12.0F + var2, 0.0F);
++
++        if (this.is64x64) {
++            this.bipedLeftArm = new ModelRenderer(32, 48);
++            this.bipedLeftArm.mirror = true;
++            this.bipedLeftArm.addBox(-1.0F, -2.0F, -2.0F, 4, 12, 4, var1);
++            this.bipedLeftArm.setRotationPoint(5.0F, 2.0F + var2, 0.0F);
++
++            this.bipedLeftLeg = new ModelRenderer(16, 48);
++            this.bipedLeftLeg.mirror = true;
++            this.bipedLeftLeg.addBox(-2.0F, 0.0F, -2.0F, 4, 12, 4, var1);
++            this.bipedLeftLeg.setRotationPoint(2.0F, 12.0F + var2, 0.0F);
++
++            this.bipedBodyWear = new ModelRenderer(16, 32);
++            this.bipedBodyWear.addBox(-4.0F, 0.0F, -2.0F, 8, 12, 4, var1 + 0.25F);
++            this.bipedBodyWear.setRotationPoint(0.0F, 0.0F + var2, 0.0F);
++
++            this.bipedRightArmwear = new ModelRenderer(40, 32);
++            this.bipedRightArmwear.addBox(-3.0F, -2.0F, -2.0F, 4, 12, 4, var1 + 0.25F);
++            this.bipedRightArmwear.setRotationPoint(-5.0F, 2.0F + var2, 0.0F);
++
++            this.bipedLeftArmwear = new ModelRenderer(48, 48);
++            this.bipedLeftArmwear.mirror = true;
++            this.bipedLeftArmwear.addBox(-1.0F, -2.0F, -2.0F, 4, 12, 4, var1 + 0.25F);
++            this.bipedLeftArmwear.setRotationPoint(5.0F, 2.0F + var2, 0.0F);
++
++            this.bipedRightLegwear = new ModelRenderer(0, 32);
++            this.bipedRightLegwear.addBox(-2.0F, 0.0F, -2.0F, 4, 12, 4, var1 + 0.25F);
++            this.bipedRightLegwear.setRotationPoint(-2.0F, 12.0F + var2, 0.0F);
++
++            this.bipedLeftLegwear = new ModelRenderer(0, 48);
++            this.bipedLeftLegwear.mirror = true;
++            this.bipedLeftLegwear.addBox(-2.0F, 0.0F, -2.0F, 4, 12, 4, var1 + 0.25F);
++            this.bipedLeftLegwear.setRotationPoint(2.0F, 12.0F + var2, 0.0F);
++        } else {
++            this.bipedLeftArm = new ModelRenderer(40, 16);
++            this.bipedLeftArm.mirror = true;
++            this.bipedLeftArm.addBox(-1.0F, -2.0F, -2.0F, 4, 12, 4, var1);
++            this.bipedLeftArm.setRotationPoint(5.0F, 2.0F + var2, 0.0F);
++
++            this.bipedLeftLeg = new ModelRenderer(0, 16);
++            this.bipedLeftLeg.mirror = true;
++            this.bipedLeftLeg.addBox(-2.0F, 0.0F, -2.0F, 4, 12, 4, var1);
++            this.bipedLeftLeg.setRotationPoint(2.0F, 12.0F + var2, 0.0F);
++        }
++    }
++
++    public void render(float var1, float var2, float var3, float var4, float var5, float var6) {
++        this.setRotationAngles(var1, var2, var3, var4, var5, var6);
++
++        if (this.is64x64) {
++            GL11.glMatrixMode(GL11.GL_TEXTURE);
++            GL11.glPushMatrix();
++            GL11.glScalef(1.0F, 0.5F, 1.0F);
++            GL11.glMatrixMode(GL11.GL_MODELVIEW);
++        }
++
++        this.bipedHead.render(var6);
++        this.bipedBody.render(var6);
++        this.bipedRightArm.render(var6);
++        this.bipedLeftArm.render(var6);
++        this.bipedRightLeg.render(var6);
++        this.bipedLeftLeg.render(var6);
++        this.bipedHeadwear.render(var6);
++
++        if (this.is64x64) {
++            this.bipedBodyWear.render(var6);
++            this.bipedRightArmwear.render(var6);
++            this.bipedLeftArmwear.render(var6);
++            this.bipedRightLegwear.render(var6);
++            this.bipedLeftLegwear.render(var6);
++
++            GL11.glMatrixMode(GL11.GL_TEXTURE);
++            GL11.glPopMatrix();
++            GL11.glMatrixMode(GL11.GL_MODELVIEW);
++        }
++    }
++
++    public void setRotationAngles(float var1, float var2, float var3, float var4, float var5, float var6) {
++        this.bipedHead.rotateAngleY = var4 / (180.0F / (float)Math.PI);
++        this.bipedHead.rotateAngleX = var5 / (180.0F / (float)Math.PI);
++
++        this.bipedRightArm.rotateAngleX = MathHelper.cos(var1 * 0.6662F + (float)Math.PI) * 2.0F * var2 * 0.5F;
++        this.bipedLeftArm.rotateAngleX = MathHelper.cos(var1 * 0.6662F) * 2.0F * var2 * 0.5F;
++        this.bipedRightArm.rotateAngleZ = 0.0F;
++        this.bipedLeftArm.rotateAngleZ = 0.0F;
++        this.bipedRightLeg.rotateAngleX = MathHelper.cos(var1 * 0.6662F) * 1.4F * var2;
++        this.bipedLeftLeg.rotateAngleX = MathHelper.cos(var1 * 0.6662F + (float)Math.PI) * 1.4F * var2;
++        this.bipedRightLeg.rotateAngleY = 0.0F;
++        this.bipedLeftLeg.rotateAngleY = 0.0F;
++
++        if (this.isRiding) {
++            this.bipedRightArm.rotateAngleX += (float)Math.PI * -0.2F;
++            this.bipedLeftArm.rotateAngleX += (float)Math.PI * -0.2F;
++            this.bipedRightLeg.rotateAngleX = (float)Math.PI * -0.4F;
++            this.bipedLeftLeg.rotateAngleX = (float)Math.PI * -0.4F;
++            this.bipedRightLeg.rotateAngleY = (float)Math.PI * 0.1F;
++            this.bipedLeftLeg.rotateAngleY = (float)Math.PI * -0.1F;
++        }
++
++        if (this.heldItemLeft) {
++            this.bipedLeftArm.rotateAngleX = this.bipedLeftArm.rotateAngleX * 0.5F - (float)Math.PI * 0.1F;
++        }
++
++        if (this.heldItemRight) {
++            this.bipedRightArm.rotateAngleX = this.bipedRightArm.rotateAngleX * 0.5F - (float)Math.PI * 0.1F;
++        }
++
++        this.bipedRightArm.rotateAngleY = 0.0F;
++        this.bipedLeftArm.rotateAngleY = 0.0F;
++
++        if (this.swingProgress > -9990.0F) {
++            float var7 = this.swingProgress;
++            this.bipedBody.rotateAngleY = MathHelper.sin(MathHelper.sqrt_float(var7) * (float)Math.PI * 2.0F) * 0.2F;
++            this.bipedRightArm.rotationPointZ = MathHelper.sin(this.bipedBody.rotateAngleY) * 5.0F;
++            this.bipedRightArm.rotationPointX = -MathHelper.cos(this.bipedBody.rotateAngleY) * 5.0F;
++            this.bipedLeftArm.rotationPointZ = -MathHelper.sin(this.bipedBody.rotateAngleY) * 5.0F;
++            this.bipedLeftArm.rotationPointX = MathHelper.cos(this.bipedBody.rotateAngleY) * 5.0F;
++            this.bipedRightArm.rotateAngleY += this.bipedBody.rotateAngleY;
++            this.bipedLeftArm.rotateAngleY += this.bipedBody.rotateAngleY;
++            this.bipedLeftArm.rotateAngleX += this.bipedBody.rotateAngleY;
++            var7 = 1.0F - this.swingProgress;
++            var7 *= var7;
++            var7 *= var7;
++            var7 = 1.0F - var7;
++            float var8 = MathHelper.sin(var7 * (float)Math.PI);
++            float var9 = MathHelper.sin(this.swingProgress * (float)Math.PI) * -(this.bipedHead.rotateAngleX - 0.7F) * (12.0F / 16.0F);
++            this.bipedRightArm.rotateAngleX = (float)((double)this.bipedRightArm.rotateAngleX - ((double)var8 * 1.2D + (double)var9));
++            this.bipedRightArm.rotateAngleY += this.bipedBody.rotateAngleY * 2.0F;
++            this.bipedRightArm.rotateAngleZ = MathHelper.sin(this.swingProgress * (float)Math.PI) * -0.4F;
++        }
++
++        if (this.isSneak) {
++            this.bipedBody.rotateAngleX = 0.5F;
++            this.bipedRightLeg.rotateAngleX -= 0.0F;
++            this.bipedLeftLeg.rotateAngleX -= 0.0F;
++            this.bipedRightArm.rotateAngleX += 0.4F;
++            this.bipedLeftArm.rotateAngleX += 0.4F;
++            this.bipedRightLeg.rotationPointZ = 4.0F;
++            this.bipedLeftLeg.rotationPointZ = 4.0F;
++            this.bipedRightLeg.rotationPointY = 9.0F;
++            this.bipedLeftLeg.rotationPointY = 9.0F;
++            this.bipedHead.rotationPointY = 1.0F;
++        } else {
++            this.bipedBody.rotateAngleX = 0.0F;
++            this.bipedRightLeg.rotationPointZ = 0.0F;
++            this.bipedLeftLeg.rotationPointZ = 0.0F;
++            this.bipedRightLeg.rotationPointY = 12.0F;
++            this.bipedLeftLeg.rotationPointY = 12.0F;
++            this.bipedHead.rotationPointY = 0.0F;
++        }
++
++        this.bipedRightArm.rotateAngleZ += MathHelper.cos(var3 * 0.09F) * 0.05F + 0.05F;
++        this.bipedLeftArm.rotateAngleZ -= MathHelper.cos(var3 * 0.09F) * 0.05F + 0.05F;
++        this.bipedRightArm.rotateAngleX += MathHelper.sin(var3 * 0.067F) * 0.05F;
++        this.bipedLeftArm.rotateAngleX -= MathHelper.sin(var3 * 0.067F) * 0.05F;
++
++        this.bipedHeadwear.rotateAngleX = this.bipedHead.rotateAngleX;
++        this.bipedHeadwear.rotateAngleY = this.bipedHead.rotateAngleY;
++        this.bipedHeadwear.rotateAngleZ = this.bipedHead.rotateAngleZ;
++        this.bipedHeadwear.rotationPointX = this.bipedHead.rotationPointX;
++        this.bipedHeadwear.rotationPointY = this.bipedHead.rotationPointY;
++        this.bipedHeadwear.rotationPointZ = this.bipedHead.rotationPointZ;
++
++        if (this.is64x64) {
++            this.bipedBodyWear.rotateAngleX = this.bipedBody.rotateAngleX;
++            this.bipedBodyWear.rotateAngleY = this.bipedBody.rotateAngleY;
++            this.bipedBodyWear.rotateAngleZ = this.bipedBody.rotateAngleZ;
++            this.bipedBodyWear.rotationPointX = this.bipedBody.rotationPointX;
++            this.bipedBodyWear.rotationPointY = this.bipedBody.rotationPointY;
++            this.bipedBodyWear.rotationPointZ = this.bipedBody.rotationPointZ;
++
++            this.bipedRightArmwear.rotateAngleX = this.bipedRightArm.rotateAngleX;
++            this.bipedRightArmwear.rotateAngleY = this.bipedRightArm.rotateAngleY;
++            this.bipedRightArmwear.rotateAngleZ = this.bipedRightArm.rotateAngleZ;
++            this.bipedRightArmwear.rotationPointX = this.bipedRightArm.rotationPointX;
++            this.bipedRightArmwear.rotationPointY = this.bipedRightArm.rotationPointY;
++            this.bipedRightArmwear.rotationPointZ = this.bipedRightArm.rotationPointZ;
++
++            this.bipedLeftArmwear.rotateAngleX = this.bipedLeftArm.rotateAngleX;
++            this.bipedLeftArmwear.rotateAngleY = this.bipedLeftArm.rotateAngleY;
++            this.bipedLeftArmwear.rotateAngleZ = this.bipedLeftArm.rotateAngleZ;
++            this.bipedLeftArmwear.rotationPointX = this.bipedLeftArm.rotationPointX;
++            this.bipedLeftArmwear.rotationPointY = this.bipedLeftArm.rotationPointY;
++            this.bipedLeftArmwear.rotationPointZ = this.bipedLeftArm.rotationPointZ;
++
++            this.bipedRightLegwear.rotateAngleX = this.bipedRightLeg.rotateAngleX;
++            this.bipedRightLegwear.rotateAngleY = this.bipedRightLeg.rotateAngleY;
++            this.bipedRightLegwear.rotateAngleZ = this.bipedRightLeg.rotateAngleZ;
++            this.bipedRightLegwear.rotationPointX = this.bipedRightLeg.rotationPointX;
++            this.bipedRightLegwear.rotationPointY = this.bipedRightLeg.rotationPointY;
++            this.bipedRightLegwear.rotationPointZ = this.bipedRightLeg.rotationPointZ;
++
++            this.bipedLeftLegwear.rotateAngleX = this.bipedLeftLeg.rotateAngleX;
++            this.bipedLeftLegwear.rotateAngleY = this.bipedLeftLeg.rotateAngleY;
++            this.bipedLeftLegwear.rotateAngleZ = this.bipedLeftLeg.rotateAngleZ;
++            this.bipedLeftLegwear.rotationPointX = this.bipedLeftLeg.rotationPointX;
++            this.bipedLeftLegwear.rotationPointY = this.bipedLeftLeg.rotationPointY;
++            this.bipedLeftLegwear.rotationPointZ = this.bipedLeftLeg.rotationPointZ;
++        }
++    }
  }
 --- net/minecraft/src/BlockFurnace.java
 +++ net/minecraft/src/BlockFurnace.java
