@@ -30,7 +30,7 @@ This project aims to provide **minimal improvement**, focused strictly on small 
 
 - Added XYZ Coordinates, World Seed, and a Day Counter to F3 Menu.
 -  Added an FPS Limiter slider to the options menu to set max framerate more accurately (Replaces the 'Limit FPS' option).
-- Added the all Inventory Shift-Clicking tweaks you are familiar with in modern versions. 
+- Added the Inventory Shift-Clicking tweaks you are familiar with in modern versions. 
 - Added a secret method you may be familiar with from Beta to prevent farmland from being trampled.
 - Added text chat to Singleplayer Worlds.
 - The game will now use your Minecraft Skin.
