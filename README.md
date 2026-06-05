@@ -32,7 +32,7 @@ This project aims to provide **minimal improvement**, focused strictly on small 
 -  Added an FPS Limiter slider to the options menu to set max framerate more accurately (Replaces the 'Limit FPS' option).
 - Added the Inventory Shift-Clicking tweaks you are familiar with in modern versions. 
 - Added a secret method you may be familiar with from Beta to prevent farmland from being trampled.
-- Added text chat to Singleplayer Worlds.
+- You can now use text chat in Singleplayer Worlds.
 - The game will now use your Minecraft Skin.
 - You can now swap items of the same kind in the inventory.
 - You can no longer accidentally eat food while your health is full.
