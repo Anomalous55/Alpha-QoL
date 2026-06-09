@@ -57,6 +57,7 @@ This project aims to provide **minimal improvement**, focused strictly on small 
 - Fixed the orientation of stairs, furnaces, chests, and double chests.
 - Fixed the hitbox of stairs.
 - Fixed a bug where Ore Generation is biased towards the positive coordinates.
+- Fixed caves being cut off along Chunk Borders.
 - Fixed a session.lock bug on OS's with aggressive CPU Schedulers.
 - Fixed a crash when placing a Sign on a Cactus.
 - Fixed torch placement when snow and a ledge are present.
