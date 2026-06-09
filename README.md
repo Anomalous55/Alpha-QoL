@@ -40,6 +40,7 @@ This project aims to provide **minimal improvement**, focused strictly on small 
 - Doubled the durability of all tools and armor.
 - Stack sizes of Wooden Doors, Iron Doors, and Signs have been increased to 16.
 - Pickaxes, axes, and spades now correctly break their intended blocks.
+- Clay is now 10% more common.
 - Saddled Pigs will now drop their saddle when killed.
 - Double slabs now drop both slabs when broken.
 - Pressure Plates, Bookshelves, and Stairs now properly drop themselves when broken.
@@ -47,6 +48,7 @@ This project aims to provide **minimal improvement**, focused strictly on small 
 - Made the UI a little bit snappier (by fixing a bug where player inputs were skipped).
 - Music now plays more often (Music is still semi-random with intervals of about 10-15 minutes instead of 20-25 minutes).
 - Fixed a major bug where world NBT Data resets upon rejoining a world.
+- Fixed the Leaf Decay Bug.
 - Fixed a bug where pressing a movement key and the Inventory key at the same time would cause you to move until the 'ESC' key is pressed.
 - Fixed a bug where liquids would be placed when interacting with a block.
 - Fixed a bug where instantly breakable blocks would be broken open returning to game from pause menu.
@@ -54,7 +56,11 @@ This project aims to provide **minimal improvement**, focused strictly on small 
 - Fixed a bug where your footsteps all play at once after sneaking.
 - Fixed the orientation of stairs, furnaces, chests, and double chests.
 - Fixed the hitbox of stairs.
-- Removed Herobrine 
+- Fixed a bug where Ore Generation is biased towards the positive coordinates.
+- Fixed a session.lock bug on OS's with aggressive CPU Schedulers.
+- Fixed a crash when placing a Sign on a Cactus.
+- Fixed torch placement when snow and a ledge are present.
+- Removed Herobrine. 
 
 ---
 
