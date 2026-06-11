@@ -2,8 +2,6 @@
 
 A lightweight `.jar` mod for **Minecraft Alpha 1.1.2_01** that makes small, focused quality-of-life improvements while staying as close to vanilla as possible.
 
----
-
 ## Disclaimer
 
 This project is not affiliated with Mojang or Microsoft.
@@ -14,8 +12,6 @@ If any content is found to violate copyright or distribution policies, it will b
 
 No copyright infringement is intended.
 
----
-
 ## About
 
 Minecraft Alpha 1.1.2_01 is an incomplete version that has a far more brutal gameplay loop than the modern releases. The limitations and constraints on content make this an interesting and nostalgic version to play, but some bugs, glitches, and inconsistencies make this version downright unfair at some points. 
@@ -23,8 +19,6 @@ Minecraft Alpha 1.1.2_01 is an incomplete version that has a far more brutal gam
 While there are existing mods that address these issues, many introduce additional mechanics or major gameplay changes that go beyond the scope of a minimal fix.
 
 This project aims to provide **minimal improvement**, focused strictly on small quality-of-life fixes without adding any new features, implementing any of the various unused assets, or compromising the brutal vanilla experience, leaving room for player ingenuity to overcome the difficulty.
-
----
 
 ## Features
 
@@ -69,8 +63,6 @@ As of the most recent version:
 - Fixed a crash when placing a Sign on a Cactus.
 - Fixed torch placement when snow and a ledge are present.
 - Removed Herobrine.
-
----
 
 ## Installation
 
