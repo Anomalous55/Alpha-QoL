@@ -26,12 +26,17 @@ This project aims to provide **minimal improvement**, focused strictly on small 
 
 ---
 
-## Change List (as of the most recent version)
+## Features
 
+As of the most recent version:
+
+### Additions
 - Added XYZ Coordinates, World Seed, and a Day Counter to F3 Menu.
--  Added an FPS Limiter slider to the options menu to set max framerate more accurately (Replaces the 'Limit FPS' option).
-- Added the Inventory Shift-Clicking tweaks you are familiar with in modern versions. 
+- Added an FPS Limiter slider to the options menu to set max framerate more accurately (Replaces the 'Limit FPS' option).
+- Added the Inventory Shift-Clicking tweaks you are familiar with in modern versions.
 - Added a secret method you may be familiar with from Beta to prevent farmland from being trampled.
+
+### Tweaks
 - You can now use text chat in Singleplayer Worlds.
 - The game will now use your Minecraft Skin.
 - You can now swap items of the same kind in the inventory.
@@ -47,6 +52,8 @@ This project aims to provide **minimal improvement**, focused strictly on small 
 - Falling Snow in Winter Mode worlds now has a less obtrusive texture.
 - Made the UI a little bit snappier (by fixing a bug where player inputs were skipped).
 - Music now plays more often (Music is still semi-random with intervals of about 10-15 minutes instead of 20-25 minutes).
+
+### Bug Fixes
 - Fixed a major bug where world NBT Data resets upon rejoining a world.
 - Fixed the Leaf Decay Bug.
 - Fixed a bug where pressing a movement key and the Inventory key at the same time would cause you to move until the 'ESC' key is pressed.
@@ -61,7 +68,7 @@ This project aims to provide **minimal improvement**, focused strictly on small 
 - Fixed a session.lock bug on OS's with aggressive CPU Schedulers.
 - Fixed a crash when placing a Sign on a Cactus.
 - Fixed torch placement when snow and a ledge are present.
-- Removed Herobrine. 
+- Removed Herobrine.
 
 ---
 
