@@ -67,10 +67,18 @@ This project aims to provide **minimal improvement**, focused strictly on small 
 
 ## Installation
 
-Download the latest release [here](https://github.com/Anomalous55/Alpha-QoL/releases).
+Prism Launcher or MultiMC is HIGHLY RECOMMENDED.
 
-Prism Launcher is HIGHLY RECOMMENDED for this task.
+### Method 1 (Prism/MultiMC)
 
-Open your `version.jar` file using an archive editor, Delete `META-INF` then add the mod files into it, overwriting existing files when prompted.
+- Create an instance of Alpha 1.1.2_01 in Prism/MultiMC.
+- Select your instance.
+- Click Edit > Version > Minecraft > Add to Minecraft.jar
+- Select the zip file.
 
-Launch the game and enjoy.
+### Method 2 (Self Patch)
+
+- Open your version.jar file using an archive editor. 
+- Delete META-INF then add the mod files from the zip file into it, overwriting existing files when prompted.
+
+Launch the game and enjoy!
