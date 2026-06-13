@@ -4,7 +4,7 @@ A lightweight `.jar` mod for **Minecraft Alpha 1.1.2_01** that makes small, focu
 
 ## NOTICE
 
-A user has cloned this repo on Jun 11th, 2026, and is attempting to pass it off as their own work in clear violation of the MIT license. This is the original repository (created on Mar 13th, 2026). For your own safety, please do not download their work or attempt to run it as there is a very likely chance they may have modified my source code and introduced undefined behavior.
+A user has cloned this repo on Jun 11th, 2026, and is attempting to pass it off as their own work in clear violation of the MIT license. This (the repository you are on now, created by Anomalous55) is the original repository (created on Mar 13th, 2026). For your own safety, please do not download their work or attempt to run it as there is a very likely chance they may have modified my source code and introduced undefined behavior.
 
 ## Disclaimer
 
