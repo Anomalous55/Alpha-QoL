@@ -2,6 +2,10 @@
 
 A lightweight `.jar` mod for **Minecraft Alpha 1.1.2_01** that makes small, focused quality-of-life improvements while staying as close to vanilla as possible.
 
+## NOTICE
+
+A user has cloned this repo on Jun 11th, 2026, and is attempting to pass it off as their own work in clear violation of the MIT license. This is the original repository (created on Mar 13th, 2026). For your own safety, please do not download their work or attempt to run it as there is a very likely chance they may have modified my source code and introduced undefined behavior.
+
 ## Disclaimer
 
 This project is not affiliated with Mojang or Microsoft.
