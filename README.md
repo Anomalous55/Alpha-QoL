@@ -4,7 +4,7 @@
 ![License](https://img.shields.io/badge/License-MIT-blue)
 ![Platform](https://img.shields.io/badge/Platform-Java-orange)
 
-Alpha-QoL is a lightweight vanilla optimization and quality-of-life mod for **Minecraft Alpha 1.1.2_01**. It focuses strictly on minor tweaks, backend modernization, and critical bug fixes while preserving the Vanilla Experience.
+[Alpha-QoL](https://anomalous55.github.io/Alpha-QoL/) is a lightweight vanilla optimization and quality-of-life mod for **Minecraft Alpha 1.1.2_01**. It focuses strictly on minor tweaks, backend modernization, and critical bug fixes while preserving the Vanilla Experience.
 
 ## NOTICE
 
