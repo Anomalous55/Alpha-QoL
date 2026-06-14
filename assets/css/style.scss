@@ -1,0 +1,32 @@
+---
+---
+
+@font-face {
+    font-family: 'Minecraftia';
+    src: url('https://cdn.jsdelivr.net/gh/South-Paw/typeface-minecraft@master/files/minecraft-regular.woff2') format('woff2');
+}
+
+body, p, li, a {
+    font-family: 'Minecraftia', monospace !important;
+    image-rendering: pixelated;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Minecraftia', monospace !important;
+    color: #ffff55 !important;
+    text-shadow: 2px 2px 0px #3f3f15 !important;
+}
+
+code, pre {
+    font-family: monospace !important;
+    text-shadow: none !important;
+}
+
+a {
+    color: #55ffff !important;
+    text-decoration: underline;
+}
+
+a:hover {
+    color: #ffffff !important;
+}
