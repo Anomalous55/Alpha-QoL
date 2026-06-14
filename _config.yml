@@ -1,0 +1,12 @@
+# Site Settings
+title: Alpha-QoL
+description: A lightweight .jar mod for Minecraft Alpha 1.1.2_01 focusing on bug fixes and vanilla quality-of-life improvements.
+theme: jekyll-theme-slate
+
+# GitHub Integration
+repository: Anomalous55/Alpha-QoL
+github:
+  is_project_page: true
+
+# Build Settings
+show_downloads: true
