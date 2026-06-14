@@ -13,6 +13,7 @@
 }
 
 html, body {
+    font-family: 'Minecraft', monospace !important; /* Applies the font to the whole page */
     background-color: #404040 !important;
     background-image: url('{{ "/assets/img/cobblestone.png" | relative_url }}') !important;
     background-repeat: repeat !important;
@@ -30,15 +31,27 @@ html, body {
 }
 
 p, li, span, div {
+    font-family: 'Minecraft', monospace !important;
     color: #e0e0e0 !important;
     text-shadow: 2px 2px 0px #000000 !important;
     line-height: 1.8 !important;
 }
 
-h1, h2, h3, h4, h5, h6 {
-    font-family: 'Minecraftia', monospace !important;
-    color: #ffff55 !important; 
-    text-shadow: 2px 2px 0px #3f3f15 !important; 
+h1 {
+    font-family: 'Minecraft', monospace !important;
+    color: #ffffff !important;
+    text-align: center !important;
+    text-shadow: 2px 2px 0px #000000 !important;
+    border-bottom: none !important; 
+    margin-top: 40px !important;
+}
+
+
+h2, h3, h4, h5, h6 {
+    font-family: 'Minecraft', monospace !important;
+    color: #ffffff !important;
+    text-align: left !important;
+    text-shadow: 2px 2px 0px #000000 !important; 
     border-bottom: none !important; 
     margin-top: 40px !important;
 }
@@ -55,6 +68,7 @@ a:hover {
 }
 
 code, pre {
+    font-family: monospace !important;
     background-color: #000000 !important;
     border: 2px solid #333333 !important;
     color: #a8a8a8 !important;
