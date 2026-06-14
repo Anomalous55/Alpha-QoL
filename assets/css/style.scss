@@ -2,8 +2,8 @@
 ---
 
 @font-face {
-    font-family: 'Minecraftia';
-    src: url('https://cdn.jsdelivr.net/gh/South-Paw/typeface-minecraft@master/files/minecraft-regular.woff2') format('woff2');
+    font-family: 'Minecraft';
+    src: url('{{ "/assets/fonts/minecraft-font.otf" | relative_url }}') format('opentype');
 }
 
 #header_wrap, #main_content_wrap {
@@ -14,7 +14,7 @@
 
 html, body {
     background-color: #404040 !important;
-    background-image: url('https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.16.5/assets/minecraft/textures/block/dirt.png') !important;
+    background-image: url('{{ "/assets/img/cobblestone.png" | relative_url }}') !important;
     background-repeat: repeat !important;
     background-size: 64px 64px !important; 
     image-rendering: pixelated !important;
