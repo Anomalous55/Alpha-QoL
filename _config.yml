@@ -3,10 +3,10 @@ description: A lightweight .jar mod for Minecraft Alpha 1.1.2_01 focusing on bug
 
 url: "https://anomalous55.github.io"
 baseurl: "/Alpha-QoL"
-
-remote_theme: cotes2020/jekyll-theme-chirpy
-theme_mode: dual
+theme: jekyll-theme-slate
 
 github:
   username: Anomalous55
   repo: https://github.com/Anomalous55/Alpha-QoL
+  is_project_page: true
+  
