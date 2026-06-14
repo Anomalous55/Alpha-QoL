@@ -9,4 +9,4 @@ github:
   is_project_page: true
 
 # Build Settings
-show_downloads: true
+show_downloads: false
