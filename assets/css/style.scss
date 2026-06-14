@@ -6,22 +6,26 @@
     src: url('https://cdn.jsdelivr.net/gh/South-Paw/typeface-minecraft@master/files/minecraft-regular.woff2') format('woff2');
 }
 
-body {
-    font-family: 'Minecraftia', monospace !important;
+#header_wrap, #main_content_wrap {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+html, body {
     background-color: #404040 !important;
-    background-image: url('https://minecraft.wiki/images/Dirt.png') !important;
+    background-image: url('https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.16.5/assets/minecraft/textures/block/dirt.png') !important;
     background-repeat: repeat !important;
     background-size: 64px 64px !important; 
     image-rendering: pixelated !important;
 }
 
-main, .wrapper, .container-lg, #main-content {
+#main_content {
     background-color: rgba(0, 0, 0, 0.85) !important;
     border: 4px solid #111111 !important;
     box-shadow: inset 0 0 0 4px #555555 !important;
     padding: 40px !important;
-    margin-top: 40px auto !important;
-    margin-bottom: 40px auto !important;
+    margin: 40px auto !important;
     max-width: 900px !important;
 }
 
@@ -33,9 +37,9 @@ p, li, span, div {
 
 h1, h2, h3, h4, h5, h6 {
     font-family: 'Minecraftia', monospace !important;
-    color: #ffff55 !important;
-    text-shadow: 2px 2px 0px #3f3f15 !important;
-    border-bottom: none !important;
+    color: #ffff55 !important; 
+    text-shadow: 2px 2px 0px #3f3f15 !important; 
+    border-bottom: none !important; 
     margin-top: 40px !important;
 }
 
@@ -55,10 +59,5 @@ code, pre {
     border: 2px solid #333333 !important;
     color: #a8a8a8 !important;
     text-shadow: none !important;
-    padding: 4px !important;
-}
-
-header, .site-header {
-    background-color: rgba(0,0,0,0.9) !important;
-    border-bottom: 4px solid #111111 !important;
+    padding: 8px !important;
 }
