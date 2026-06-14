@@ -74,11 +74,11 @@ As of the most recent version:
 
 ## Installation
 
-Prism Launcher or MultiMC is HIGHLY RECOMMENDED.
+Download the latest release ***[here](https://github.com/Anomalous55/Alpha-QoL/releases)***.
 
-### Method 1 (Prism/MultiMC)
+### Method 1 (MultiMC/Prism)
 
-- Create an instance of Alpha 1.1.2_01 in Prism/MultiMC.
+- Create an instance of Alpha 1.1.2_01 in MultiMC/Prism.
 - Select your instance.
 - Click Edit > Version > Minecraft > Add to Minecraft.jar
 - Select the zip file.
