@@ -1,6 +1,10 @@
 # Alpha-QoL
 
-A lightweight `.jar` mod for **Minecraft Alpha 1.1.2_01** that makes small, focused quality-of-life improvements while staying as close to vanilla as possible.
+![Minecraft Version](https://img.shields.io/badge/Minecraft-Alpha_1.1.2__01-brightgreen)
+![License](https://img.shields.io/badge/License-MIT-blue)
+![Platform](https://img.shields.io/badge/Platform-Java-orange)
+
+Alpha-QoL is a lightweight vanilla optimization and quality-of-life mod for **Minecraft Alpha 1.1.2_01**. It focuses strictly on minor tweaks, backend modernization, and critical bug fixes while preserving the Vanilla Experience.
 
 ## NOTICE
 
