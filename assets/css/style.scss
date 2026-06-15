@@ -13,7 +13,7 @@
 }
 
 html, body {
-    font-family: 'Minecraft', monospace !important; /* Applies the font to the whole page */
+    font-family: 'Minecraft', monospace !important;
     background-color: #404040 !important;
     background-image: url('{{ "/assets/img/cobblestone.png" | relative_url }}') !important;
     background-repeat: repeat !important;
@@ -46,7 +46,6 @@ h1 {
     margin-top: 40px !important;
 }
 
-
 h2, h3, h4, h5, h6 {
     font-family: 'Minecraft', monospace !important;
     color: #ffffff !important;
@@ -54,6 +53,17 @@ h2, h3, h4, h5, h6 {
     text-shadow: 2px 2px 0px #000000 !important; 
     border-bottom: none !important; 
     margin-top: 40px !important;
+}
+
+header h2 {
+    color: #ffffff !important; 
+    line-height: 1.6 !important;
+    text-shadow: 
+        2px 2px 0px #000000,
+        -1px -1px 0px #111111,  
+         1px -1px 0px #111111,
+        -1px  1px 0px #111111,
+         1px  1px 0px #111111 !important;
 }
 
 a {
