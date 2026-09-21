@@ -18,7 +18,7 @@ No copyright infringement is intended.
 
 ## About
 
-Minecraft Alpha 1.1.2_01 is an incomplete version that has a far more brutal gameplay loop than the modern releases. The limitations and constraints on content make this an interesting and nostalgic version to play, but some bugs, glitches, and inconsistencies make this version downright unfair at some points. 
+Minecraft Alpha 1.1.2_01 is an incomplete version. The limitations and constraints on content make this an interesting and nostalgic version to play, but some bugs, glitches, and inconsistencies make this version downright unfair at some points. 
 
 While there are existing mods that address these issues, many introduce additional mechanics or major gameplay changes that go beyond the scope of a minimal fix.
 
