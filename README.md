@@ -31,7 +31,7 @@ As of the most recent version:
 ### Additions
 - Added XYZ and F Coordinates, World Seed, and a Day Counter to F3 Menu.
 - Added an FPS Limiter slider to the options menu to set max framerate more accurately (Replaces the 'Limit FPS' option).
-- Added the Inventory Shift-Clicking/Numkey tweaks you are familiar with in modern versions.
+- Added the Inventory Shift-Clicking/Numkey/Pick-Block tweaks you are familiar with in modern versions.
 - Added a secret method you may be familiar with from Beta to prevent farmland from being trampled.
 - Added F1 HUD Visibility Toggle.
 - Added Screenshots with F2.
@@ -47,6 +47,7 @@ As of the most recent version:
 - Added Item Tooltips.
 - Added F3+G Chunk Border Viewing Toggle.
 - Added F3+B Entity Hitbox/Viewpath Viewing Toggle.
+- Added the ability to edit signs.
 
 ### Tweaks
 - The game will now use your Minecraft Skin, including those of you with Slim Skins.
@@ -63,12 +64,15 @@ As of the most recent version:
 - Saddled Pigs will now drop their saddle when killed.
 - Chickens now have a larger, more accurate hitbox.
 - Double slabs now drop both slabs when broken.
+- The top half of a double slab can now be placed even if there is a block above it.
 - Pressure Plates, Bookshelves, and Stairs now properly drop themselves when broken.
 - Made the UI a little bit snappier (by fixing a bug where player inputs were skipped).
 - Music now plays more often (Music is still semi-random with intervals of about 10-15 minutes instead of 20-25 minutes).
 - Furnaces will now drop their contents when broken.
 - Furnaces will not consume the bucket when lava is used as fuel.
+- Furnace slots now have input validation.
 - TNT Explosions now drop more blocks.
+- Mob Spawners now again show the little spinning mob.
 - Removed the deprecated 'Tutorial World' Button from the Main Menu.
 - Throttled Chunk Updates when new chunks are not being rendered to prevent the main thread from overloading
 - Replaced the lookup table used to calculate certain values with a smaller, more optimized version.
@@ -88,7 +92,10 @@ As of the most recent version:
 - Fixed a bug where instantly breakable blocks would be broken open returning to game from pause menu.
 - Fixed a bug where your footsteps all play at once after sneaking.
 - Fixed a bug where mob shadows would render in a grid after disabling the 3D Anaglyph Setting.
+- Fixed a bug where the player will fall through floors after sneaking and reloading a world.
+- Fixed a bug where items would render behind blocks in the inventory.
 - Fixed the hitbox of stairs.
+- Fixed the in-game score when you die returning the color literal.
 - Fixed a session.lock bug on OS's with aggressive CPU Schedulers.
 - Fixed a crash when placing a Sign on a Cactus.
 - Fixed torch placement when snow and a ledge are present.
