@@ -52,7 +52,7 @@ As of the most recent version:
 ### Tweaks
 - The game will now use your Minecraft Skin, including those of you with Slim Skins.
 - The world height limit has been raised to 256.
-- A completely refactored controls menu with far more customization.
+- A completely revamped controls menu with far more customization.
 - You can now use text chat in Singleplayer Worlds.
 - You can now swap items of the same kind in the inventory.
 - You can no longer accidentally eat food while your health is full.
