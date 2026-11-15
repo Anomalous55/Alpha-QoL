@@ -30,6 +30,7 @@ As of the most recent version:
 
 ### Additions
 - Added XYZ and F Coordinates, World Seed, and a Day Counter to F3 Menu.
+- Added the ability to set a world's name and seed upon creation.
 - Added an FPS Limiter slider to the options menu to set max framerate more accurately (Replaces the 'Limit FPS' option).
 - Added (most of) the Inventory Shift-Clicking/Numkey/Pick Block tweaks you are familiar with in modern versions.
 - Added a secret method you may be familiar with from Beta to prevent farmland from being trampled.
@@ -41,9 +42,11 @@ As of the most recent version:
 - Added a GUI Scale Button.
 - Added a V-Sync button.
 - Added a Fullscreen Toggle.
+
 - Added a "Quit Game" Button to the main menu.
 - Added the ability to toggle the appearance of falling snow to a more unobtrusive texture.
 - Added the ability to toggle the "Minecraft Alpha 1.1.2_01" Version Overlay.
+- Added the ability to individually toggle Leaves and Clouds between Fast and Fancy graphics, and turn clouds off if you so choose.
 - Added Item Tooltips.
 - Added F3+G Chunk Border Viewing Toggle.
 - Added F3+B Entity Hitbox/Viewpath Viewing Toggle.
@@ -53,6 +56,7 @@ As of the most recent version:
 - The game will now use your Minecraft Skin, including those of you with Slim Skins.
 - The world height limit has been raised to 256.
 - A completely revamped controls menu with far more customization.
+- A completely revamped World menu, allowing you to have more than 5 worlds, and rename them from the menu.
 - You can now use text chat in Singleplayer Worlds.
 - You can now swap items of the same kind in the inventory.
 - You can no longer accidentally eat food while your health is full.
@@ -98,6 +102,7 @@ As of the most recent version:
 - Fixed a bug where instantly breakable blocks would be broken open returning to game from pause menu.
 - Fixed a bug where your footsteps all play at once after sneaking.
 - Fixed a bug where mob shadows would render in a grid after disabling the 3D Anaglyph Setting.
+- Fixed a bug where mobs can spawn on leaves with fast graphics enabled.
 - Fixed the ingame score displaying the color literal.
 - Fixed the hitbox of stairs.
 - Fixed a session.lock bug on OS's with aggressive CPU Schedulers.
