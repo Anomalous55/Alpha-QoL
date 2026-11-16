@@ -42,12 +42,12 @@ As of the most recent version:
 - Added a GUI Scale Button.
 - Added a V-Sync button.
 - Added a Fullscreen Toggle.
-
 - Added a "Quit Game" Button to the main menu.
 - Added the ability to toggle the appearance of falling snow to a more unobtrusive texture.
 - Added the ability to toggle the "Minecraft Alpha 1.1.2_01" Version Overlay.
 - Added the ability to individually toggle Leaves and Clouds between Fast and Fancy graphics, and turn clouds off if you so choose.
 - Added Item Tooltips.
+- Added F3+H Advanced Item Tooltips Toggle.
 - Added F3+G Chunk Border Viewing Toggle.
 - Added F3+B Entity Hitbox/Viewpath Viewing Toggle.
 - Added the ability to edit signs.
@@ -56,7 +56,7 @@ As of the most recent version:
 - The game will now use your Minecraft Skin, including those of you with Slim Skins.
 - The world height limit has been raised to 256.
 - A completely revamped controls menu with far more customization.
-- A completely revamped World menu, allowing you to have more than 5 worlds, and rename them from the menu.
+- A completely revamped World menu, allowing you to have more than 5 worlds, rename them, and reorder them from the menu.
 - You can now use text chat in Singleplayer Worlds.
 - You can now swap items of the same kind in the inventory.
 - You can no longer accidentally eat food while your health is full.
