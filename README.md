@@ -76,8 +76,6 @@ As of the most recent version:
 - You can now use text chat in Singleplayer Worlds.
 - Pressing `/` now opens chat with `/` already entered.
 - You can now swap items of the same kind in the inventory.
-- Completed inventory double-click stacking.
-- Advanced Tooltips now display one durability value for damageable items, alongside their ID. Non-damageable items display only their ID beneath the item name.
 - You can no longer accidentally eat food while your health is full.
 - Cacti will no longer destroy dropped Cactus items.
 - Doubled the durability of all tools and armor.
@@ -97,7 +95,7 @@ As of the most recent version:
 - Furnaces will now drop their contents when broken.
 - Furnaces will not consume the bucket when lava is used as fuel.
 - Furnaces now have input validation.
-- The little spinning mob returns to mob spawners.
+- The little spinning mob has been returned to spawners.
 - TNT Explosions now drop more blocks.
 - Removed the deprecated 'Tutorial World' Button from the Main Menu.
 - Throttled Chunk Updates when new chunks are not being rendered to prevent the main thread from overloading.
@@ -117,7 +115,7 @@ As of the most recent version:
 - Fixed inventory item icon draw layers.
 - Fixed blocks and other non-damageable items incorrectly displaying durability information and durability bars.
 - Fixed interactions passing through doors and torches when viewed up close.
-- (Hopefully) Fixed a crash caused by invalid chunk-sorting comparisons, which could occur when switching third-person camera modes.
+- Fixed a crash caused by invalid chunk-sorting comparisons, which could occur when switching third-person camera modes.
 - Fixed a bug where sneaking and reloading the world would cause you to fall through blocks.
 - Fixed a bug where pressing a movement key and the Inventory key at the same time would cause you to move until the game is paused.
 - Fixed a bug where levers disappear when broken by water flowing from above.
@@ -126,7 +124,7 @@ As of the most recent version:
 - Fixed a bug where your footsteps all play at once after sneaking.
 - Fixed a bug where mob shadows would render in a grid after disabling the 3D Anaglyph Setting.
 - Fixed a bug where mobs can spawn on leaves with fast graphics enabled.
-- Fixed the ingame score displaying the color literal.
+- Fixed the ingame score displaying the color literal. (No changes to how score is awarded (It isn't))
 - Fixed the hitbox of stairs.
 - Fixed a session.lock bug on OS's with aggressive CPU Schedulers.
 - Fixed a crash when placing a Sign on a Cactus.
