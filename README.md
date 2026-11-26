@@ -37,7 +37,6 @@ As of the most recent version:
 - Added a secret method you may be familiar with from Beta to prevent farmland from being trampled.
 - Added F1 HUD Visibility Toggle.
 - Added Screenshots with F2.
-- Added screenshot feedback in chat, showing the saved filename. Click the message to open the screenshot.
 - Added a front-facing third person camera angle.
 - Added a new video settings submenu to hold the new graphical options.
 - Added an FOV Slider.
@@ -57,11 +56,10 @@ As of the most recent version:
 - Added a separate Kills tab displaying total mob kills and individual mob counts.
 - Added singleplayer commands:
   - `/help` — Displays available commands and their usage.
-  - `/seed` — Displays the world seed.
+  - `/seed` — Displays the world seed. [Click to copy!]
   - `/time` — Displays the world's raw time.
-  - `/coords` — Displays your current coordinates.
+  - `/coords` — Displays your current coordinates. [Click to copy!]
   - `/save` — Saves the world.
-- Added clickable `/seed` and `/coords` results to copy them to the clipboard.
 - Added command history and Tab completion to singleplayer chat.
 - Added mouse-wheel scrolling through older chat messages.
 
