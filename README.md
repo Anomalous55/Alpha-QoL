@@ -29,6 +29,7 @@ This project aims to provide **minimal improvement**, focused strictly on small 
 As of the most recent version:
 
 ### Additions
+
 - Added XYZ and F Coordinates, World Seed, and a Day Counter to F3 Menu.
 - Added the ability to set a world's name and seed upon creation.
 - Added an FPS Limiter slider to the options menu to set max framerate more accurately (Replaces the 'Limit FPS' option).
@@ -36,6 +37,7 @@ As of the most recent version:
 - Added a secret method you may be familiar with from Beta to prevent farmland from being trampled.
 - Added F1 HUD Visibility Toggle.
 - Added Screenshots with F2.
+- Added screenshot feedback in chat, showing the saved filename. Click the message to open the screenshot.
 - Added a front-facing third person camera angle.
 - Added a new video settings submenu to hold the new graphical options.
 - Added an FOV Slider.
@@ -51,14 +53,31 @@ As of the most recent version:
 - Added F3+G Chunk Border Viewing Toggle.
 - Added F3+B Entity Hitbox/Viewpath Viewing Toggle.
 - Added the ability to edit signs.
+- Added a Statistics menu, accessible from the pause menu.
+- Added a separate Kills tab displaying total mob kills and individual mob counts.
+- Added singleplayer commands:
+  - `/help` — Displays available commands and their usage.
+  - `/seed` — Displays the world seed.
+  - `/time` — Displays the world's raw time.
+  - `/coords` — Displays your current coordinates.
+  - `/save` — Saves the world.
+- Added clickable `/seed` and `/coords` results to copy them to the clipboard.
+- Added command history and Tab completion to singleplayer chat.
+- Added mouse-wheel scrolling through older chat messages.
 
 ### Tweaks
+
 - The game will now use your Minecraft Skin, including those of you with Slim Skins.
 - The world height limit has been raised to 256.
 - A completely revamped controls menu with far more customization.
 - A completely revamped World menu, allowing you to have more than 5 worlds, rename them, and reorder them from the menu.
+- Normal and Snowy world types are selectable upon world creation.
+- You can now save multiplayer servers, with options to add, edit, delete, and directly connect.
 - You can now use text chat in Singleplayer Worlds.
+- Pressing `/` now opens chat with `/` already entered.
 - You can now swap items of the same kind in the inventory.
+- Completed inventory double-click stacking.
+- Advanced Tooltips now display one durability value for damageable items, alongside their ID. Non-damageable items display only their ID beneath the item name.
 - You can no longer accidentally eat food while your health is full.
 - Cacti will no longer destroy dropped Cactus items.
 - Doubled the durability of all tools and armor.
@@ -81,12 +100,13 @@ As of the most recent version:
 - The little spinning mob returns to mob spawners.
 - TNT Explosions now drop more blocks.
 - Removed the deprecated 'Tutorial World' Button from the Main Menu.
-- Throttled Chunk Updates when new chunks are not being rendered to prevent the main thread from overloading
+- Throttled Chunk Updates when new chunks are not being rendered to prevent the main thread from overloading.
 - Replaced the lookup table used to calculate certain values with a smaller, more optimized version.
 - Replaced the Random function in certain algorithms with a faster version.
 - Generated Chunks are checked for caves in a more optimized circular pattern, rather than a square one.
 
 ### Bug Fixes
+
 - Fixed the Leaf Decay Bug.
 - Fixed a bug where Ore Generation is biased towards the positive coordinates.
 - Fixed caves being cut off along Chunk Borders.
@@ -95,11 +115,14 @@ As of the most recent version:
 - Fixed Slime Chunk generation.
 - Fixed a bug where multiple item shadows would render while Fancy Graphics are enabled.
 - Fixed inventory item icon draw layers.
+- Fixed blocks and other non-damageable items incorrectly displaying durability information and durability bars.
+- Fixed interactions passing through doors and torches when viewed up close.
+- (Hopefully) Fixed a crash caused by invalid chunk-sorting comparisons, which could occur when switching third-person camera modes.
 - Fixed a bug where sneaking and reloading the world would cause you to fall through blocks.
 - Fixed a bug where pressing a movement key and the Inventory key at the same time would cause you to move until the game is paused.
 - Fixed a bug where levers disappear when broken by water flowing from above.
 - Fixed a bug where liquids would be placed when interacting with a block.
-- Fixed a bug where instantly breakable blocks would be broken open returning to game from pause menu.
+- Fixed a bug where instantly breakable blocks would be broken upon returning to game from pause menu.
 - Fixed a bug where your footsteps all play at once after sneaking.
 - Fixed a bug where mob shadows would render in a grid after disabling the 3D Anaglyph Setting.
 - Fixed a bug where mobs can spawn on leaves with fast graphics enabled.
