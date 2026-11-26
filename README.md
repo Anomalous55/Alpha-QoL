@@ -22,7 +22,7 @@ Minecraft Alpha 1.1.2_01 is an incomplete version. The limitations and constrain
 
 While there are existing mods that address these issues, many introduce additional mechanics or major gameplay changes that go beyond the scope of a minimal fix.
 
-This project aims to provide **minimal improvement**, focused strictly on small quality-of-life fixes without adding any new features, implementing any of the various unused assets, or compromising the brutal vanilla experience, leaving room for player ingenuity to overcome the difficulty.
+This project aims to provide **minimal improvement**, focused strictly on small quality-of-life fixes without adding any new gameplay features, implementing any of the various unused assets, or compromising the brutal vanilla experience, leaving room for player ingenuity to overcome the difficulty.
 
 ## Features
 
